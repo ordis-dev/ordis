@@ -1,0 +1,65 @@
+name: Documentation
+description: Suggest improvements to documentation
+title: "[Docs] "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation! Please describe what needs to be updated or added.
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs attention?
+      options:
+        - README
+        - API Documentation
+        - Contributing Guidelines
+        - Code Comments
+        - Examples
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What documentation needs to be added, updated, or clarified?
+      placeholder: The CLI usage examples in README.md are outdated after the recent API changes
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Documentation (Optional)
+      description: Quote or describe the existing documentation that needs changes
+      placeholder: |
+        Current README shows:
+        ```
+        ordis extract --schema schema.json --input data.txt
+        ```
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed Changes
+      description: What should the documentation say instead?
+      placeholder: |
+        Should be updated to:
+        ```
+        ordis extract --schema schema.json --input data.txt --base http://localhost:11434/v1 --model llama3.1:8b
+        ```
+
+  - type: textarea
+    id: location
+    attributes:
+      label: File Location (Optional)
+      description: Which files need to be updated?
+      placeholder: |
+        - README.md (lines 25-30)
+        - docs/CONTRIBUTING.md
+        - src/cli.ts (help text)

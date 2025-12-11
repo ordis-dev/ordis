@@ -1,0 +1,22 @@
+{
+  "fields": {
+    "invoice_id": {
+      "type": "string",
+      "description": "Unique invoice identifier"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Total invoice amount"
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["USD", "SGD", "EUR"],
+      "description": "Currency code"
+    },
+    "date": {
+      "type": "date",
+      "optional": true,
+      "description": "Invoice date"
+    }
+  }
+}

@@ -1,0 +1,70 @@
+name: Hotfix
+description: Urgent production fix that needs immediate attention
+title: "[Hotfix] "
+labels: ["hotfix", "urgent"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🚨 **Urgent Fix Required** 🚨
+        
+        This template is for critical issues that need immediate attention and cannot wait for the normal development cycle.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Critical Issue
+      description: What is the urgent problem that needs fixing?
+      placeholder: CLI crashes when encountering malformed JSON schema files, blocking all users
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: What is affected and how severe is the impact?
+      placeholder: |
+        - All users cannot process schema files with syntax errors
+        - CLI exits with unclear error message
+        - No graceful handling of malformed JSON
+        - Severity: High - affects core functionality
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Minimal steps to reproduce the critical issue
+      placeholder: |
+        1. Create schema file with syntax error: `{"fields": {"name": "string"}` (missing closing brace)
+        2. Run: `ordis extract --schema broken.schema.json --input test.txt`
+        3. CLI crashes with stack trace
+    validations:
+      required: true
+
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed Fix
+      description: What needs to be changed to resolve this urgently?
+      placeholder: |
+        - Add try/catch around JSON.parse() in schema loader
+        - Return clear error message for malformed JSON
+        - Gracefully exit with helpful error instead of crashing
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing
+    attributes:
+      label: Testing Plan
+      description: How will you verify the fix works?
+      placeholder: |
+        - Test with malformed JSON schema files
+        - Verify graceful error handling
+        - Ensure normal schema files still work
+        - Test CLI exits with appropriate error codes
+    validations:
+      required: true
