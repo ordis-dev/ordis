@@ -1,0 +1,92 @@
+name: Refactor
+description: Code improvement without changing functionality
+title: "[Refactor] "
+labels: ["refactor", "technical-debt"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the codebase! Refactoring makes the code cleaner, more maintainable, and easier to understand.
+
+  - type: dropdown
+    id: refactor_type
+    attributes:
+      label: Refactor Type
+      description: What kind of refactoring is this?
+      options:
+        - Code structure reorganization
+        - Extract functions/classes
+        - Improve naming and readability
+        - Remove code duplication
+        - Simplify complex logic
+        - Update dependencies
+        - Performance improvement
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be refactored and why?
+      placeholder: |
+        The CLI argument parsing logic in cli.ts is getting complex and hard to maintain. 
+        We should extract it into a separate module for better organization and testability.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_issues
+    attributes:
+      label: Current Issues
+      description: What problems does the current code have?
+      placeholder: |
+        - Single file with 200+ lines mixing CLI logic and argument parsing
+        - Difficult to unit test argument parsing separately
+        - Hard to add new CLI options without making file even larger
+        - No clear separation of concerns
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_changes
+    attributes:
+      label: Proposed Changes
+      description: How should the code be refactored?
+      placeholder: |
+        - Extract argument parsing into src/utils/args.ts
+        - Create interfaces for CLI configuration
+        - Separate validation logic from parsing logic
+        - Add unit tests for argument parsing
+        - Keep cli.ts focused on main execution flow
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Benefits
+      description: What improvements will this refactoring provide?
+      placeholder: |
+        - Better code organization and separation of concerns
+        - Easier to unit test individual components
+        - Simpler to add new CLI options in the future
+        - More maintainable codebase
+        - Clearer code structure for new contributors
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know the refactoring is complete and successful?
+      placeholder: |
+        - All existing functionality works exactly the same
+        - Code is organized into logical modules
+        - Unit tests cover the refactored components
+        - Build and CLI tests still pass
+        - Code is more readable and maintainable
+    validations:
+      required: true

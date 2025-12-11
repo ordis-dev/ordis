@@ -1,0 +1,59 @@
+name: Feature Request
+description: Request a new feature or enhancement
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please fill out the sections below to help us understand what you'd like to see.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Brief explanation of what needs to be done and why
+      placeholder: |
+        Create the initial project structure for ordis-cli including:
+        - TypeScript/Node.js setup
+        - Basic CLI entrypoint
+        - Project configuration files
+        - Directory structure for schemas and core logic
+    validations:
+      required: true
+
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: List specific actionable items that need to be completed
+      placeholder: |
+        - [ ] Initialize npm project with TypeScript
+        - [ ] Set up build tooling
+        - [ ] Create basic CLI scaffolding
+        - [ ] Add example schema and input files
+        - [ ] Update README with accurate build/run instructions
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: Clear, testable conditions that define when this work is complete
+      placeholder: |
+        - Project builds successfully with `npm run build`
+        - CLI runs with `--help` flag
+        - Example files are present in `examples/` directory
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context (Optional)
+      description: Any additional information, related issues, or implementation notes
+      placeholder: |
+        - Related to #X
+        - Depends on #Y
+        - See external resource: https://example.com
