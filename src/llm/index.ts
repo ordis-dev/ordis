@@ -7,6 +7,7 @@ export { LLMError, LLMErrorCodes } from './errors.js';
 export { buildSystemPrompt, buildUserPrompt } from './prompt-builder.js';
 export type {
     LLMConfig,
+    RetryConfig,
     ChatMessage,
     LLMRequest,
     LLMResponse,

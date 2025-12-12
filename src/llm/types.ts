@@ -5,6 +5,16 @@
 import type { Schema } from '../schemas/types.js';
 
 /**
+ * Retry configuration
+ */
+export interface RetryConfig {
+    maxRetries: number;
+    initialDelay: number;
+    maxDelay: number;
+    backoffFactor: number;
+}
+
+/**
  * Configuration for LLM client
  */
 export interface LLMConfig {
@@ -14,6 +24,7 @@ export interface LLMConfig {
     temperature?: number;
     maxTokens?: number;
     timeout?: number;
+    retries?: RetryConfig;
 }
 
 /**

@@ -18,6 +18,12 @@ export class LLMClient {
         maxTokens: number;
         timeout: number;
     };
+    private retryConfig: {
+        maxRetries: number;
+        initialDelay: number;
+        maxDelay: number;
+        backoffFactor: number;
+    };
 
     constructor(config: LLMConfig) {
         this.config = {
@@ -25,6 +31,12 @@ export class LLMClient {
             maxTokens: 2000,
             timeout: 30000,
             ...config,
+        };
+        this.retryConfig = config.retries || {
+            maxRetries: 3,
+            initialDelay: 1000,
+            maxDelay: 10000,
+            backoffFactor: 2,
         };
     }
 
@@ -49,11 +61,90 @@ export class LLMClient {
             max_tokens: this.config.maxTokens,
         };
 
-        // Call API
-        const response = await this.chat(request);
+        // Call API with retries
+        const response = await this.chatWithRetry(request);
 
         // Parse response
         return this.parseExtractionResponse(response);
+    }
+
+    /**
+     * Calls chat completion API with retry logic
+     */
+    private async chatWithRetry(request: LLMRequest): Promise<LLMResponse> {
+        let lastError: LLMError | null = null;
+        let attempt = 0;
+
+        while (attempt <= this.retryConfig.maxRetries) {
+            try {
+                return await this.chat(request);
+            } catch (error) {
+                lastError = error as LLMError;
+
+                // Don't retry on non-retryable errors
+                if (!this.isRetryableError(lastError)) {
+                    throw lastError;
+                }
+
+                // Last attempt - don't wait
+                if (attempt === this.retryConfig.maxRetries) {
+                    throw lastError;
+                }
+
+                // Calculate delay with exponential backoff and jitter
+                const delay = this.calculateDelay(attempt, lastError);
+                
+                // Wait before retry
+                await this.sleep(delay);
+                
+                attempt++;
+            }
+        }
+
+        throw lastError!;
+    }
+
+    /**
+     * Checks if error is retryable
+     */
+    private isRetryableError(error: LLMError): boolean {
+        const retryableCodes: LLMErrorCode[] = [
+            LLMErrorCodes.NETWORK_ERROR,
+            LLMErrorCodes.TIMEOUT,
+            LLMErrorCodes.RATE_LIMIT,
+            LLMErrorCodes.API_ERROR,
+        ];
+        return retryableCodes.includes(error.code);
+    }
+
+    /**
+     * Calculates delay with exponential backoff and jitter
+     */
+    private calculateDelay(attempt: number, error: LLMError): number {
+        // Check for Retry-After header in rate limit errors
+        if (error.code === LLMErrorCodes.RATE_LIMIT && error.details?.retryAfter) {
+            const retryAfter = Number(error.details.retryAfter) * 1000;
+            return Math.min(retryAfter, this.retryConfig.maxDelay);
+        }
+
+        // Exponential backoff: initialDelay * (backoffFactor ^ attempt)
+        const exponentialDelay = 
+            this.retryConfig.initialDelay * 
+            Math.pow(this.retryConfig.backoffFactor, attempt);
+
+        // Add jitter (random 0-25% of delay)
+        const jitter = exponentialDelay * 0.25 * Math.random();
+        const delayWithJitter = exponentialDelay + jitter;
+
+        // Cap at maxDelay
+        return Math.min(delayWithJitter, this.retryConfig.maxDelay);
+    }
+
+    /**
+     * Sleep utility
+     */
+    private sleep(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     /**
@@ -114,6 +205,7 @@ export class LLMClient {
         const status = response.status;
         let errorMessage = `API error: ${status} ${response.statusText}`;
         let errorCode: LLMErrorCode = LLMErrorCodes.API_ERROR;
+        const details: Record<string, unknown> = {};
 
         try {
             const errorData = await response.json() as { error?: { message?: string } };
@@ -126,9 +218,14 @@ export class LLMClient {
             errorCode = LLMErrorCodes.AUTHENTICATION_ERROR;
         } else if (status === 429) {
             errorCode = LLMErrorCodes.RATE_LIMIT;
+            // Capture Retry-After header if present
+            const retryAfter = response.headers.get('Retry-After');
+            if (retryAfter) {
+                details.retryAfter = retryAfter;
+            }
         }
 
-        throw new LLMError(errorMessage, errorCode, status);
+        throw new LLMError(errorMessage, errorCode, status, details);
     }
 
     /**
