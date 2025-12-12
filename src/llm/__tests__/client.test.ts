@@ -228,10 +228,12 @@ describe('LLMClient', () => {
         });
 
         it('should handle 429 rate limit error', async () => {
-            vi.mocked(fetch).mockResolvedValueOnce({
+            // Mock all retries to fail with 429
+            vi.mocked(fetch).mockResolvedValue({
                 ok: false,
                 status: 429,
                 statusText: 'Too Many Requests',
+                headers: new Headers(),
                 json: async () => ({ error: { message: 'Rate limit exceeded' } }),
             } as Response);
 
@@ -239,6 +241,12 @@ describe('LLMClient', () => {
                 baseURL: 'https://api.openai.com/v1',
                 apiKey: 'key',
                 model: 'gpt-4',
+                retries: {
+                    maxRetries: 2,
+                    initialDelay: 10,
+                    maxDelay: 100,
+                    backoffFactor: 2,
+                },
             });
 
             const schema: Schema = {
@@ -255,11 +263,18 @@ describe('LLMClient', () => {
         });
 
         it('should handle network errors', async () => {
-            vi.mocked(fetch).mockRejectedValueOnce(new Error('Network failure'));
+            // Mock all retries to fail with network error
+            vi.mocked(fetch).mockRejectedValue(new Error('Network failure'));
 
             const client = new LLMClient({
                 baseURL: 'http://localhost:11434/v1',
                 model: 'llama3',
+                retries: {
+                    maxRetries: 2,
+                    initialDelay: 10,
+                    maxDelay: 100,
+                    backoffFactor: 2,
+                },
             });
 
             const schema: Schema = {
