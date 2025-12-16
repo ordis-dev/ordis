@@ -7,7 +7,7 @@
 /**
  * Supported field types in schema definitions
  */
-export type FieldType = 'string' | 'number' | 'date' | 'enum';
+export type FieldType = 'string' | 'number' | 'date' | 'enum' | 'boolean';
 
 /**
  * Field definition within a schema

@@ -1,0 +1,25 @@
+PATIENT: Morrison, Emma L. | DOB: 04/23/1987 | MRN: H-9823-4471
+
+ENCOUNTER DATE: December 14, 2024
+CHIEF COMPLAINT: Follow-up post-op, left knee arthroscopy
+
+VITALS: BP 128/82, HR 74, Temp 98.4°F, O2 Sat 98%
+
+HISTORY: Pt is s/p arthroscopic meniscectomy (CPT 29881) on 11/20/24. Reports mild pain (3/10), decreased from 7/10 at last visit. ROM improving. No erythema, warmth, or drainage noted. Sutures removed today.
+
+ASSESSMENT: Post-op recovery progressing well. Pain control adequate w/ OTC analgesics.
+
+PLAN:
+- Continue PT 2x/week × 4 more weeks
+- F/u in 6 wks or PRN
+- RTC immediately if increased pain, swelling, or fever >101°F
+- May resume light jogging in 3-4 weeks per PT clearance
+
+MEDICATIONS:
+- Ibuprofen 400mg PO q6h PRN pain
+- D/C Norco (was 5/325mg q4-6h PRN)
+
+Next appt: 01/25/2025 @ 10:00 AM
+
+Dr. Sarah Chen, MD (NPI: 1234567890)
+Orthopedic Surgery

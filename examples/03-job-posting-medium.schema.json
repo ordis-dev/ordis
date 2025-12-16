@@ -1,0 +1,38 @@
+{
+  "fields": {
+    "title": {
+      "type": "string",
+      "description": "Job title"
+    },
+    "min_years_experience": {
+      "type": "number",
+      "description": "Minimum years of experience required"
+    },
+    "salary_min": {
+      "type": "number",
+      "description": "Minimum salary in dollars (numeric only, no commas or currency symbols)"
+    },
+    "salary_max": {
+      "type": "number",
+      "description": "Maximum salary in dollars (numeric only, no commas or currency symbols)"
+    },
+    "is_remote": {
+      "type": "boolean",
+      "description": "Whether remote work is allowed"
+    },
+    "employment_type": {
+      "type": "string",
+      "enum": ["Full-time", "Part-time", "Contract"],
+      "description": "Employment type"
+    }
+  },
+  "confidence": {
+    "threshold": 85,
+    "failOnLowConfidence": true
+  },
+  "metadata": {
+    "name": "Job Posting Extraction",
+    "version": "1.0.0",
+    "description": "Medium: Extract structured data with inference and type conversion"
+  }
+}

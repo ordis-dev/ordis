@@ -1,0 +1,10 @@
+{
+  "contract_id": "SA-2024-Q4-00789",
+  "start_date": "2024-11-15",
+  "end_date": "2026-05-14",
+  "duration_months": 18,
+  "setup_fee": 2500,
+  "monthly_fee": 850,
+  "total_contract_value": 17800,
+  "termination_notice_days": 60
+}

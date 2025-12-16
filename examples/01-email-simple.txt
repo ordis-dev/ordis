@@ -1,0 +1,7 @@
+From: john.doe@example.com
+Subject: Meeting Tomorrow
+
+Hi team, let's meet tomorrow at 2pm to discuss the project.
+
+Thanks,
+John

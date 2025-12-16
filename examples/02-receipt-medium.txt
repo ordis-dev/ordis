@@ -1,0 +1,16 @@
+COFFEE SHOP RECEIPT
+====================
+Date: 2024-12-15
+Time: 09:45 AM
+
+Items:
+- Latte (Grande) ... $5.50
+- Croissant ........ $3.25
+- Tip .............. $1.25
+
+Subtotal: $8.75
+Tax: $0.70
+TOTAL: $9.45
+
+Payment: Visa ****1234
+Thank you!

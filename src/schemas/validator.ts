@@ -5,7 +5,7 @@
 import type { Schema, FieldDefinition, FieldType } from './types.js';
 import { SchemaValidationError, ErrorCodes } from './errors.js';
 
-const VALID_FIELD_TYPES: FieldType[] = ['string', 'number', 'date', 'enum'];
+const VALID_FIELD_TYPES: FieldType[] = ['string', 'number', 'date', 'enum', 'boolean'];
 
 /**
  * Validates a schema definition

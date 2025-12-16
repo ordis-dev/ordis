@@ -1,0 +1,45 @@
+{
+  "fields": {
+    "contract_id": {
+      "type": "string",
+      "description": "Contract identifier"
+    },
+    "start_date": {
+      "type": "date",
+      "description": "Contract start date in ISO format (YYYY-MM-DD)"
+    },
+    "end_date": {
+      "type": "date",
+      "description": "Contract end date in ISO format (YYYY-MM-DD)"
+    },
+    "duration_months": {
+      "type": "number",
+      "description": "Contract duration in months (calculate from the term)"
+    },
+    "setup_fee": {
+      "type": "number",
+      "description": "One-time setup fee in dollars"
+    },
+    "monthly_fee": {
+      "type": "number",
+      "description": "Monthly recurring fee in dollars"
+    },
+    "total_contract_value": {
+      "type": "number",
+      "description": "Total contract value: setup fee + (monthly fee × duration in months)"
+    },
+    "termination_notice_days": {
+      "type": "number",
+      "description": "Number of days notice required for termination"
+    }
+  },
+  "confidence": {
+    "threshold": 80,
+    "failOnLowConfidence": true
+  },
+  "metadata": {
+    "name": "Contract Extraction",
+    "version": "1.0.0",
+    "description": "Medium-Hard: Extract dates, calculate values, understand terms"
+  }
+}
