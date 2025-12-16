@@ -1,0 +1,19 @@
+SERVICE AGREEMENT #SA-2024-Q4-00789
+
+This Agreement is entered into on the 3rd day of November, 2024, between:
+
+CLIENT: TechStart Inc. (EIN: 12-3456789)
+VENDOR: CloudServe Solutions LLC (EIN: 98-7654321)
+
+TERM: This agreement commences on 2024-11-15 and continues for eighteen (18) months, terminating on 2026-05-14 unless renewed.
+
+FEES: Client agrees to pay Vendor as follows:
+- Setup fee (one-time): $2,500.00
+- Monthly recurring: $850.00 per month
+- Overage charges: $0.15 per GB over 500GB monthly limit
+
+PAYMENT TERMS: Net 15 days from invoice date. Late payments subject to 1.5% monthly interest.
+
+Either party may terminate with 60 days written notice.
+
+Signed: [Digital signature present]

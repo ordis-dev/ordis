@@ -1,0 +1,33 @@
+{
+  "fields": {
+    "date": {
+      "type": "date",
+      "description": "Receipt date in ISO format"
+    },
+    "subtotal": {
+      "type": "number",
+      "description": "Subtotal amount (excluding tax)"
+    },
+    "tax": {
+      "type": "number",
+      "description": "Tax amount"
+    },
+    "total": {
+      "type": "number",
+      "description": "Total amount paid"
+    },
+    "payment_method": {
+      "type": "string",
+      "description": "Payment method (card type or cash)"
+    }
+  },
+  "confidence": {
+    "threshold": 85,
+    "failOnLowConfidence": true
+  },
+  "metadata": {
+    "name": "Receipt Extraction",
+    "version": "1.0.0",
+    "description": "Medium-Easy: Extract receipt details with numbers"
+  }
+}

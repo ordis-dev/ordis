@@ -1,0 +1,15 @@
+Senior Backend Engineer - Remote OK
+
+We're looking for an experienced backend engineer to join our team. You'll work with Python, Go, and PostgreSQL to build scalable microservices.
+
+Requirements:
+• 5+ years backend development
+• Strong Python/Go skills
+• Database design experience
+• Not required but nice: Kubernetes, AWS
+
+Salary: $120k-$160k depending on experience
+Location: San Francisco or Remote (US only)
+Type: Full-time, benefits included
+
+Apply at: jobs@techcorp.io with your resume and GitHub profile.

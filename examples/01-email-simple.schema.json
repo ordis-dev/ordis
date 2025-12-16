@@ -1,0 +1,21 @@
+{
+  "fields": {
+    "from_email": {
+      "type": "string",
+      "description": "Sender's email address"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Email subject line"
+    }
+  },
+  "confidence": {
+    "threshold": 90,
+    "failOnLowConfidence": true
+  },
+  "metadata": {
+    "name": "Simple Email Extraction",
+    "version": "1.0.0",
+    "description": "Easy: Extract basic email metadata"
+  }
+}

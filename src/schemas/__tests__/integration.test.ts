@@ -120,7 +120,7 @@ describe('Schema System Integration', () => {
                 expect(err.message).toContain('text');
                 expect(err.field).toBe('name');
                 expect(err.code).toBe(ErrorCodes.INVALID_FIELD_TYPE);
-                expect(err.details?.validTypes).toEqual(['string', 'number', 'date', 'enum']);
+                expect(err.details?.validTypes).toEqual(['string', 'number', 'date', 'enum', 'boolean']);
             }
         });
 

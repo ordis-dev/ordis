@@ -157,6 +157,17 @@ function validateField(
                 });
             }
             break;
+
+        case 'boolean':
+            if (typeof value !== 'boolean') {
+                errors.push({
+                    field: fieldName,
+                    message: `Field '${fieldName}' must be a boolean, got ${typeof value}`,
+                    code: PipelineErrorCodes.TYPE_MISMATCH,
+                    value,
+                });
+            }
+            break;
     }
 
     return errors;
