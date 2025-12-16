@@ -32,6 +32,22 @@ describe('CLI', () => {
         });
     });
 
+    describe('version command', () => {
+        it('should display version with --version flag', async () => {
+            const { stdout } = await execAsync(`node ${CLI_PATH} --version`);
+            
+            expect(stdout).toContain('ordis-cli v');
+            expect(stdout).toMatch(/v\d+\.\d+\.\d+/);
+        });
+
+        it('should display version with -v flag', async () => {
+            const { stdout } = await execAsync(`node ${CLI_PATH} -v`);
+            
+            expect(stdout).toContain('ordis-cli v');
+            expect(stdout).toMatch(/v\d+\.\d+\.\d+/);
+        });
+    });
+
     describe('error handling', () => {
         it('should error when no command specified', async () => {
             try {

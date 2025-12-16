@@ -1,6 +1,7 @@
 {
   "name": "ordis-cli",
   "version": "0.1.0",
+  "type": "module",
   "description": "Schema-first LLM extraction tool that turns unstructured text into validated structured data",
   "main": "dist/cli.js",
   "bin": {
@@ -36,6 +37,11 @@
   "engines": {
     "node": ">=18.0.0"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@types/node": "^24.10.2",
     "@vitest/ui": "^4.0.15",

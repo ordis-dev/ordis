@@ -10,6 +10,7 @@ import * as path from 'path';
 import { loadSchema } from './schemas/loader.js';
 import { extract } from './core/pipeline.js';
 import type { LLMConfig } from './llm/types.js';
+import packageJson from '../package.json' with { type: 'json' };
 
 interface CliArgs {
     command?: string;
@@ -28,6 +29,11 @@ function parseArgs(args: string[]): CliArgs {
 
         if (arg === '--help' || arg === '-h') {
             showHelp();
+            process.exit(0);
+        }
+
+        if (arg === '--version' || arg === '-v') {
+            showVersion();
             process.exit(0);
         }
 
@@ -65,6 +71,7 @@ OPTIONS:
   --base <url>      Base URL for OpenAI-compatible API
   --model <name>    Model name to use for extraction
   --debug           Enable verbose debug output
+  --version, -v     Show version number
   --help, -h        Show this help message
 
 EXAMPLES:
@@ -80,6 +87,10 @@ EXAMPLES:
 
 For more information, visit: https://github.com/ordis-dev/ordis-cli
 `);
+}
+
+function showVersion(): void {
+    console.log(`ordis-cli v${packageJson.version}`);
 }
 
 async function runExtraction(args: CliArgs): Promise<void> {
