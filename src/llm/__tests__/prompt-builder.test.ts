@@ -125,6 +125,72 @@ describe('Prompt Builder', () => {
             expect(prompt).toContain('"confidence"');
             expect(prompt).toContain('"confidenceByField"');
         });
+
+        it('should NOT include few-shot examples by default', () => {
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                    age: { type: 'number' },
+                },
+            };
+
+            const prompt = buildSystemPrompt(schema);
+
+            expect(prompt).not.toContain('Example extraction:');
+            expect(prompt).not.toContain('INV-2024-0042');
+        });
+
+        it('should include few-shot examples when explicitly enabled', () => {
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                    age: { type: 'number' },
+                },
+                prompt: {
+                    includeFewShotExamples: true,
+                },
+            };
+
+            const prompt = buildSystemPrompt(schema);
+
+            expect(prompt).toContain('Example extraction:');
+            expect(prompt).toContain('Input text:');
+            expect(prompt).toContain('Output:');
+        });
+
+        it('should include example with null values when enabled', () => {
+            const schema: Schema = {
+                fields: {
+                    email: { type: 'string' },
+                    phone: { type: 'string', optional: true },
+                },
+                prompt: {
+                    includeFewShotExamples: true,
+                },
+            };
+
+            const prompt = buildSystemPrompt(schema);
+
+            expect(prompt).toContain('null');
+            expect(prompt).toContain('missing or uncertain');
+        });
+
+        it('should include invoice example when enabled', () => {
+            const schema: Schema = {
+                fields: {
+                    invoice_id: { type: 'string' },
+                    amount: { type: 'number' },
+                },
+                prompt: {
+                    includeFewShotExamples: true,
+                },
+            };
+
+            const prompt = buildSystemPrompt(schema);
+
+            expect(prompt).toContain('INV-2024-0042');
+            expect(prompt).toContain('1250.00');
+        });
     });
 
     describe('buildUserPrompt', () => {

@@ -36,6 +36,9 @@ export interface Schema {
         threshold: number; // Minimum confidence score (0-100) required for success
         failOnLowConfidence: boolean; // Whether to fail extraction if below threshold
     };
+    prompt?: {
+        includeFewShotExamples?: boolean; // Whether to include few-shot examples in prompt (default: false)
+    };
 }
 
 /**
