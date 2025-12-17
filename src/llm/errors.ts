@@ -9,6 +9,7 @@ export const LLMErrorCodes = {
     INVALID_RESPONSE: 'INVALID_RESPONSE',
     AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
     RATE_LIMIT: 'RATE_LIMIT',
+    TOKEN_LIMIT_EXCEEDED: 'TOKEN_LIMIT_EXCEEDED',
 } as const;
 
 export type LLMErrorCode = (typeof LLMErrorCodes)[keyof typeof LLMErrorCodes];

@@ -299,6 +299,89 @@ describe('LLMClient', () => {
             expect(config.apiKey).toBeUndefined();
         });
 
+        it('should throw TOKEN_LIMIT_EXCEEDED when token budget exceeded', async () => {
+            const client = new LLMClient({
+                baseURL: 'http://localhost:11434/v1',
+                model: 'llama3',
+                maxContextTokens: 100, // Very small limit
+            });
+
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                    age: { type: 'number' },
+                },
+            };
+
+            // Large input that will exceed 100 token limit
+            const largeInput = 'test '.repeat(200); // ~1000 chars = ~250 tokens
+
+            await expect(
+                client.extract({
+                    schema,
+                    input: largeInput,
+                })
+            ).rejects.toThrow(LLMError);
+
+            try {
+                await client.extract({
+                    schema,
+                    input: largeInput,
+                });
+            } catch (error) {
+                expect(error).toBeInstanceOf(LLMError);
+                expect((error as LLMError).code).toBe(LLMErrorCodes.TOKEN_LIMIT_EXCEEDED);
+                expect((error as LLMError).message).toContain('Token budget exceeded');
+            }
+        });
+
+        it('should succeed when token budget is sufficient', async () => {
+            const mockResponse: LLMResponse = {
+                id: 'test-id',
+                object: 'chat.completion',
+                created: Date.now(),
+                model: 'test-model',
+                choices: [
+                    {
+                        index: 0,
+                        message: {
+                            role: 'assistant',
+                            content: JSON.stringify({
+                                data: { name: 'Test' },
+                                confidence: 90,
+                                confidenceByField: { name: 90 },
+                            }),
+                        },
+                        finish_reason: 'stop',
+                    },
+                ],
+            };
+
+            vi.mocked(fetch).mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockResponse,
+            } as Response);
+
+            const client = new LLMClient({
+                baseURL: 'http://localhost:11434/v1',
+                model: 'llama3',
+                maxContextTokens: 8192, // Large limit
+            });
+
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                },
+            };
+
+            const result = await client.extract({
+                schema,
+                input: 'Short input',
+            });
+
+            expect(result.data.name).toBe('Test');
+        });
+
         it('should create LM Studio config', () => {
             const config = LLMPresets.lmStudio('my-model');
             expect(config.baseURL).toBe('http://localhost:1234/v1');

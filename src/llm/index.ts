@@ -5,6 +5,7 @@
 export { LLMClient, createLLMClient, LLMPresets } from './client.js';
 export { LLMError, LLMErrorCodes } from './errors.js';
 export { buildSystemPrompt, buildUserPrompt } from './prompt-builder.js';
+export { TokenCounter, estimateTokens } from './token-counter.js';
 export type {
     LLMConfig,
     RetryConfig,
@@ -13,4 +14,6 @@ export type {
     LLMResponse,
     ExtractionOptions,
     ExtractionResponse,
+    TokenBudget,
 } from './types.js';
+export type { TokenUsage, TokenCounterConfig } from './token-counter.js';

@@ -30,6 +30,7 @@ export type {
 export { LLMClient, createLLMClient, LLMPresets } from './llm/client.js';
 export { LLMError, LLMErrorCodes } from './llm/errors.js';
 export { buildSystemPrompt, buildUserPrompt } from './llm/prompt-builder.js';
+export { TokenCounter, estimateTokens } from './llm/token-counter.js';
 export type {
     LLMConfig,
     RetryConfig,
@@ -38,4 +39,6 @@ export type {
     LLMResponse,
     ExtractionOptions,
     ExtractionResponse,
+    TokenBudget,
 } from './llm/types.js';
+export type { TokenUsage, TokenCounterConfig } from './llm/token-counter.js';

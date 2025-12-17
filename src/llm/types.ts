@@ -15,6 +15,18 @@ export interface RetryConfig {
 }
 
 /**
+ * Token budget breakdown
+ */
+export interface TokenBudget {
+    /** Maximum tokens for system prompt */
+    system: number;
+    /** Maximum tokens for user input */
+    input: number;
+    /** Reserved tokens for model output */
+    output: number;
+}
+
+/**
  * Configuration for LLM client
  */
 export interface LLMConfig {
@@ -25,6 +37,14 @@ export interface LLMConfig {
     maxTokens?: number;
     timeout?: number;
     retries?: RetryConfig;
+    /** Maximum context tokens (default: 4096) */
+    maxContextTokens?: number;
+    /** Token budget breakdown */
+    tokenBudget?: TokenBudget;
+    /** Warn when token usage exceeds this percentage (default: 90) */
+    warnThreshold?: number;
+    /** Enable debug logging for token usage */
+    debugTokens?: boolean;
 }
 
 /**

@@ -11,6 +11,7 @@ import type {
 } from './types.js';
 import { LLMError, LLMErrorCodes, type LLMErrorCode } from './errors.js';
 import { buildSystemPrompt, buildUserPrompt } from './prompt-builder.js';
+import { TokenCounter } from './token-counter.js';
 
 export class LLMClient {
     private config: LLMConfig & {
@@ -24,6 +25,7 @@ export class LLMClient {
         maxDelay: number;
         backoffFactor: number;
     };
+    private tokenCounter: TokenCounter;
 
     constructor(config: LLMConfig) {
         this.config = {
@@ -38,6 +40,11 @@ export class LLMClient {
             maxDelay: 10000,
             backoffFactor: 2,
         };
+        this.tokenCounter = new TokenCounter({
+            maxContextTokens: config.maxContextTokens,
+            tokenBudget: config.tokenBudget,
+            warnThreshold: config.warnThreshold,
+        });
     }
 
     /**
@@ -49,6 +56,29 @@ export class LLMClient {
         // Build prompts
         const system = systemPrompt || buildSystemPrompt(schema);
         const user = buildUserPrompt(input);
+
+        // Check token budget
+        const usage = this.tokenCounter.calculateUsage(system, user);
+        
+        // Debug logging if enabled
+        if (this.config.debugTokens) {
+            console.error('[Token Usage]\n' + this.tokenCounter.formatUsage(usage));
+        }
+
+        // Error if over limit
+        if (this.tokenCounter.exceedsLimit(usage)) {
+            throw new LLMError(
+                this.tokenCounter.getErrorMessage(usage),
+                LLMErrorCodes.TOKEN_LIMIT_EXCEEDED,
+                undefined,
+                { usage }
+            );
+        }
+
+        // Warn if approaching limit
+        if (this.tokenCounter.shouldWarn(usage)) {
+            console.warn(this.tokenCounter.getWarningMessage(usage));
+        }
 
         // Create request
         const request: LLMRequest = {
@@ -114,6 +144,7 @@ export class LLMClient {
             LLMErrorCodes.RATE_LIMIT,
             LLMErrorCodes.API_ERROR,
         ];
+        // Don't retry token limit errors
         return retryableCodes.includes(error.code);
     }
 

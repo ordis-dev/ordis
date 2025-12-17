@@ -15,6 +15,7 @@ Ordis is a local-first CLI tool that turns messy, unstructured text into clean, 
 - **Local-first extraction**: Supports Ollama, LM Studio, or any OpenAI-compatible endpoint
 - **Schema-first workflow**: Define your data structure upfront
 - **Deterministic output**: Returns validated records or structured failures
+- **Token budget awareness**: Automatic token counting with warnings and limits
 - **Dual-purpose**: Use as CLI tool or import as library
 - **TypeScript support**: Full type definitions included
 
@@ -156,6 +157,7 @@ const result = await extract({
 - ✅ Schema loader and validator
 - ✅ Prompt builder with confidence scoring
 - ✅ Universal LLM client (OpenAI-compatible APIs)
+- ✅ Token budget awareness with warnings and errors
 - ✅ Structured error system
 - ✅ CLI extraction command
 - ✅ Programmatic API for library usage
@@ -173,7 +175,9 @@ npm run benchmark
 ```
 
 ## Roadmap
-
+Smart input truncation ([#40](https://github.com/ordis-dev/ordis-cli/issues/40))
+- [ ] Multi-pass extraction for large inputs ([#41](https://github.com/ordis-dev/ordis-cli/issues/41))
+- [ ] 
 - [ ] Config file support ([#16](https://github.com/ordis-dev/ordis-cli/issues/16))
 - [ ] Output formatting options ([#14](https://github.com/ordis-dev/ordis-cli/issues/14))
 - [ ] Batch extraction ([#19](https://github.com/ordis-dev/ordis-cli/issues/19))
