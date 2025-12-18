@@ -97,6 +97,17 @@ ordis extract \
   --debug
 ```
 
+**With API key** (for providers like OpenAI, Deepseek, etc.):
+
+```bash
+ordis extract \
+  --schema examples/invoice.schema.json \
+  --input examples/invoice.txt \
+  --base https://api.deepseek.com/v1 \
+  --model deepseek-chat \
+  --api-key your-api-key-here
+```
+
 ### Programmatic Usage
 
 Use ordis as a library in your Node.js application:

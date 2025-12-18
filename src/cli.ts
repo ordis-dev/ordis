@@ -18,6 +18,7 @@ interface CliArgs {
     input?: string;
     base?: string;
     model?: string;
+    apiKey?: string;
     debug?: boolean;
 }
 
@@ -50,6 +51,8 @@ function parseArgs(args: string[]): CliArgs {
             parsed.base = args[++i];
         } else if (arg === '--model' && args[i + 1]) {
             parsed.model = args[++i];
+        } else if (arg === '--api-key' && args[i + 1]) {
+            parsed.apiKey = args[++i];
         } else if (!arg.startsWith('--')) {
             parsed.command = arg;
         }
@@ -70,6 +73,7 @@ OPTIONS:
   --input <path>    Path to input text file
   --base <url>      Base URL for OpenAI-compatible API
   --model <name>    Model name to use for extraction
+  --api-key <key>   API key for the LLM provider (optional)
   --debug           Enable verbose debug output
   --version, -v     Show version number
   --help, -h        Show this help message
@@ -152,6 +156,7 @@ async function runExtraction(args: CliArgs): Promise<void> {
         const llmConfig: LLMConfig = {
             baseURL: args.base,
             model: args.model,
+            ...(args.apiKey && { apiKey: args.apiKey }),
         };
 
         if (args.debug) {
