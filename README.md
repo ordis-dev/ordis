@@ -179,9 +179,19 @@ npm run benchmark
 ```
 
 ## Roadmap
-Smart input truncation ([#40](https://github.com/ordis-dev/ordis/issues/40))
+
+**Completed in v0.1.0:**
+- ✅ Core extraction pipeline with schema validation
+- ✅ Token budget awareness and management
+- ✅ Confidence scoring for extracted data
+- ✅ Programmatic API for library usage
+- ✅ CLI tool with debug mode
+- ✅ Comprehensive test suite and benchmarks
+- ✅ Support for any OpenAI-compatible API
+
+**Upcoming:**
+- [ ] Smart input truncation ([#40](https://github.com/ordis-dev/ordis/issues/40))
 - [ ] Multi-pass extraction for large inputs ([#41](https://github.com/ordis-dev/ordis/issues/41))
-- [ ] 
 - [ ] Config file support ([#16](https://github.com/ordis-dev/ordis/issues/16))
 - [ ] Output formatting options ([#14](https://github.com/ordis-dev/ordis/issues/14))
 - [ ] Batch extraction ([#19](https://github.com/ordis-dev/ordis/issues/19))

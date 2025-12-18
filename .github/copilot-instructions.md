@@ -50,6 +50,7 @@ examples/            # Sample schemas and input files
 - **Useful errors**: Return structured, descriptive errors that explain what went wrong and where
 - **Configuration**: Store API keys and endpoints in `.env` (never commit)
 - **Examples**: Add example schemas and input files to `examples/` directory
+- **Documentation format**: Use lists and sections instead of ASCII tables for better readability
 
 ## Integration Points
 
