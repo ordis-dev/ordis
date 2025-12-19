@@ -56,7 +56,7 @@ describe('Prompt Builder', () => {
             const schema: Schema = {
                 fields: {
                     status: {
-                        type: 'enum',
+                        type: 'string',
                         enum: ['active', 'inactive', 'pending'],
                     },
                 },

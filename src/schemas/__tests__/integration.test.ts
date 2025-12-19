@@ -20,12 +20,13 @@ describe('Schema System Integration', () => {
             "description": "Total invoice amount"
           },
           "currency": {
-            "type": "enum",
+            "type": "string",
             "enum": ["USD", "SGD", "EUR"],
             "description": "Currency code"
           },
           "date": {
-            "type": "date",
+            "type": "string",
+            "format": "date-time",
             "optional": true,
             "description": "Invoice date"
           }
@@ -67,7 +68,7 @@ describe('Schema System Integration', () => {
             "max": 999999.99
           },
           "status": {
-            "type": "enum",
+            "type": "string",
             "enum": ["draft", "pending", "approved", "rejected", "archived"]
           },
           "email": {
@@ -120,11 +121,11 @@ describe('Schema System Integration', () => {
                 expect(err.message).toContain('text');
                 expect(err.field).toBe('name');
                 expect(err.code).toBe(ErrorCodes.INVALID_FIELD_TYPE);
-                expect(err.details?.validTypes).toEqual(['string', 'number', 'date', 'enum', 'boolean']);
+                expect(err.details?.validTypes).toEqual(['string', 'number', 'integer', 'boolean']);
             }
         });
 
-        it('should provide clear error for enum without values', () => {
+        it('should provide clear error for invalid field type', () => {
             const schemaJson = '{ "fields": { "status": { "type": "enum" } } }';
 
             try {
@@ -133,9 +134,9 @@ describe('Schema System Integration', () => {
             } catch (error) {
                 expect(error).toBeInstanceOf(SchemaValidationError);
                 const err = error as SchemaValidationError;
-                expect(err.message).toContain("must have an 'enum' property");
+                expect(err.message).toContain('invalid type');
                 expect(err.field).toBe('status');
-                expect(err.code).toBe(ErrorCodes.MISSING_ENUM_VALUES);
+                expect(err.code).toBe(ErrorCodes.INVALID_FIELD_TYPE);
             }
         });
 
@@ -176,17 +177,18 @@ describe('Schema System Integration', () => {
             "description": "Price in cents"
           },
           "category": {
-            "type": "enum",
+            "type": "string",
             "enum": ["electronics", "clothing", "books", "food"],
             "description": "Product category"
           },
           "in_stock": {
-            "type": "enum",
+            "type": "string",
             "enum": ["yes", "no"],
             "description": "Stock availability"
           },
           "discontinued_date": {
-            "type": "date",
+            "type": "string",
+            "format": "date-time",
             "optional": true,
             "description": "Date when product was discontinued"
           }
@@ -214,11 +216,12 @@ describe('Schema System Integration', () => {
             "max": 10000
           },
           "event_type": {
-            "type": "enum",
+            "type": "string",
             "enum": ["conference", "workshop", "webinar", "meetup"]
           },
           "event_date": {
-            "type": "date"
+            "type": "string",
+            "format": "date-time"
           },
           "registration_email": {
             "type": "string",
@@ -378,7 +381,7 @@ describe('Schema System Integration', () => {
             "min": 0
           },
           "payment_status": {
-            "type": "enum",
+            "type": "string",
             "enum": ["paid", "pending", "overdue"]
           }
         },

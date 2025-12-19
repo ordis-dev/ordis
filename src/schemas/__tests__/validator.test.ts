@@ -27,8 +27,8 @@ describe('Schema Validator', () => {
                 fields: {
                     name: { type: 'string' },
                     age: { type: 'number' },
-                    birthdate: { type: 'date' },
-                    status: { type: 'enum', enum: ['active', 'inactive'] },
+                    birthdate: { type: 'string', format: 'date-time' },
+                    status: { type: 'string', enum: ['active', 'inactive'] },
                 },
             };
 
@@ -211,7 +211,7 @@ describe('Schema Validator', () => {
             const schema = {
                 fields: {
                     status: {
-                        type: 'enum',
+                        type: 'string',
                         enum: ['active', 'inactive', 'pending'],
                     },
                 },
@@ -220,21 +220,20 @@ describe('Schema Validator', () => {
             expect(() => validateSchema(schema)).not.toThrow();
         });
 
-        it('should reject enum field without enum property', () => {
+        it('should allow string field without enum property', () => {
             const schema = {
                 fields: {
-                    status: { type: 'enum' },
+                    status: { type: 'string' },
                 },
             };
 
-            expect(() => validateSchema(schema)).toThrow(SchemaValidationError);
-            expect(() => validateSchema(schema)).toThrow(/must have an 'enum' property/);
+            expect(() => validateSchema(schema)).not.toThrow();
         });
 
         it('should reject enum with non-array value', () => {
             const schema = {
                 fields: {
-                    status: { type: 'enum', enum: 'not an array' },
+                    status: { type: 'string', enum: 'not an array' },
                 },
             };
 
@@ -244,7 +243,7 @@ describe('Schema Validator', () => {
         it('should reject enum with empty array', () => {
             const schema = {
                 fields: {
-                    status: { type: 'enum', enum: [] },
+                    status: { type: 'string', enum: [] },
                 },
             };
 
@@ -255,7 +254,7 @@ describe('Schema Validator', () => {
         it('should reject enum with non-string values', () => {
             const schema = {
                 fields: {
-                    status: { type: 'enum', enum: ['active', 123, 'inactive'] },
+                    status: { type: 'string', enum: ['active', 123, 'inactive'] },
                 },
             };
 
@@ -265,7 +264,7 @@ describe('Schema Validator', () => {
         it('should reject enum with duplicate values', () => {
             const schema = {
                 fields: {
-                    status: { type: 'enum', enum: ['active', 'inactive', 'active'] },
+                    status: { type: 'string', enum: ['active', 'inactive', 'active'] },
                 },
             };
 
@@ -506,7 +505,7 @@ describe('Schema Validator', () => {
         it('should include additional details for enum errors', () => {
             const schema = {
                 fields: {
-                    status: { type: 'enum', enum: ['active', 123] },
+                    status: { type: 'string', enum: ['active', 123] },
                 },
             };
 

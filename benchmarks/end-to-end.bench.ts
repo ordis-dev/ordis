@@ -13,7 +13,7 @@ const schema = loadSchemaFromObject({
         invoice_id: { type: 'string' },
         amount: { type: 'number' },
         currency: { type: 'string', enum: ['USD', 'EUR', 'GBP'] },
-        date: { type: 'date', optional: true }
+        date: { type: 'string', format: 'date-time', optional: true }
     },
     confidence: {
         threshold: 80,

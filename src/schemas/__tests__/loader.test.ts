@@ -90,8 +90,8 @@ describe('Schema Loader', () => {
                 fields: {
                     invoice_id: { type: 'string', description: 'Invoice ID' },
                     amount: { type: 'number', min: 0 },
-                    currency: { type: 'enum', enum: ['USD', 'EUR', 'GBP'] },
-                    date: { type: 'date', optional: true },
+                    currency: { type: 'string', enum: ['USD', 'EUR', 'GBP'] },
+                    date: { type: 'string', format: 'date-time', optional: true },
                     email: { type: 'string', pattern: '^[a-z]+@[a-z]+\\.[a-z]+$' },
                 },
             };
@@ -134,8 +134,8 @@ describe('Schema Loader', () => {
                 fields: {
                     id: { type: 'string' },
                     count: { type: 'number', min: 0, max: 100 },
-                    status: { type: 'enum', enum: ['active', 'inactive'] },
-                    created: { type: 'date', optional: true },
+                    status: { type: 'string', enum: ['active', 'inactive'] },
+                    created: { type: 'string', format: 'date-time', optional: true },
                 },
                 metadata: {
                     name: 'Complete Schema',
@@ -249,12 +249,13 @@ describe('Schema Loader', () => {
                         description: 'Total invoice amount',
                     },
                     currency: {
-                        type: 'enum',
+                        type: 'string',
                         enum: ['USD', 'SGD', 'EUR'],
                         description: 'Currency code',
                     },
                     date: {
-                        type: 'date',
+                        type: 'string',
+                        format: 'date-time',
                         optional: true,
                         description: 'Invoice date',
                     },
@@ -267,7 +268,7 @@ describe('Schema Loader', () => {
             const loaded = await loadSchema(filePath);
             expect(loaded.fields.invoice_id.type).toBe('string');
             expect(loaded.fields.amount.type).toBe('number');
-            expect(loaded.fields.currency.type).toBe('enum');
+            expect(loaded.fields.currency.type).toBe('string');
             expect(loaded.fields.currency.enum).toEqual(['USD', 'SGD', 'EUR']);
             expect(loaded.fields.date.optional).toBe(true);
         });
@@ -289,7 +290,7 @@ describe('Schema Loader', () => {
                         max: 120,
                     },
                     role: {
-                        type: 'enum',
+                        type: 'string',
                         enum: ['user', 'admin', 'moderator'],
                     },
                     bio: {

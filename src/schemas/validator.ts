@@ -5,7 +5,7 @@
 import type { Schema, FieldDefinition, FieldType } from './types.js';
 import { SchemaValidationError, ErrorCodes } from './errors.js';
 
-const VALID_FIELD_TYPES: FieldType[] = ['string', 'number', 'date', 'enum', 'boolean'];
+const VALID_FIELD_TYPES: FieldType[] = ['string', 'number', 'integer', 'boolean'];
 
 /**
  * Validates a schema definition
@@ -149,31 +149,23 @@ function validateFieldDefinition(fieldName: string, fieldDef: unknown): void {
     // Type-specific validations
     const fieldType = def.type as FieldType;
 
-    if (fieldType === 'enum') {
-        validateEnumField(fieldName, def);
-    }
-
-    if (fieldType === 'number') {
+    if (fieldType === 'number' || fieldType === 'integer') {
         validateNumberField(fieldName, def);
     }
 
     if (fieldType === 'string') {
         validateStringField(fieldName, def);
+        // Validate enum constraint if present
+        if (def.enum) {
+            validateEnumConstraint(fieldName, def);
+        }
     }
 }
 
 /**
- * Validates enum field constraints
+ * Validates enum constraint on string fields
  */
-function validateEnumField(fieldName: string, def: Record<string, unknown>): void {
-    if (!def.enum) {
-        throw new SchemaValidationError(
-            `Field '${fieldName}' with type 'enum' must have an 'enum' property`,
-            ErrorCodes.MISSING_ENUM_VALUES,
-            fieldName
-        );
-    }
-
+function validateEnumConstraint(fieldName: string, def: Record<string, unknown>): void {
     if (!Array.isArray(def.enum)) {
         throw new SchemaValidationError(
             `Field '${fieldName}' enum property must be an array`,

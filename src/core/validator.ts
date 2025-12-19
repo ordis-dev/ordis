@@ -72,19 +72,31 @@ function validateField(
                     code: PipelineErrorCodes.TYPE_MISMATCH,
                     value,
                 });
-            } else if (fieldDef.pattern) {
-                try {
-                    const regex = new RegExp(fieldDef.pattern);
-                    if (!regex.test(value)) {
-                        errors.push({
-                            field: fieldName,
-                            message: `Field '${fieldName}' does not match pattern: ${fieldDef.pattern}`,
-                            code: PipelineErrorCodes.FIELD_INVALID,
-                            value,
-                        });
+            } else {
+                // Check enum constraint
+                if (fieldDef.enum && !fieldDef.enum.includes(value)) {
+                    errors.push({
+                        field: fieldName,
+                        message: `Field '${fieldName}' must be one of: ${fieldDef.enum.join(', ')}. Got: ${value}`,
+                        code: PipelineErrorCodes.FIELD_INVALID,
+                        value,
+                    });
+                }
+                // Check pattern constraint
+                if (fieldDef.pattern) {
+                    try {
+                        const regex = new RegExp(fieldDef.pattern);
+                        if (!regex.test(value)) {
+                            errors.push({
+                                field: fieldName,
+                                message: `Field '${fieldName}' does not match pattern: ${fieldDef.pattern}`,
+                                code: PipelineErrorCodes.FIELD_INVALID,
+                                value,
+                            });
+                        }
+                    } catch (e) {
+                        // Invalid regex in schema - should be caught by schema validation
                     }
-                } catch (e) {
-                    // Invalid regex in schema - should be caught by schema validation
                 }
             }
             break;
@@ -117,44 +129,32 @@ function validateField(
             }
             break;
 
-        case 'date':
-            // Accept string or Date object
-            if (typeof value !== 'string' && !(value instanceof Date)) {
+        case 'integer':
+            if (typeof value !== 'number' || !Number.isInteger(value)) {
                 errors.push({
                     field: fieldName,
-                    message: `Field '${fieldName}' must be a date string or Date object`,
+                    message: `Field '${fieldName}' must be an integer`,
                     code: PipelineErrorCodes.TYPE_MISMATCH,
                     value,
                 });
             } else {
-                // Try to parse as date
-                const dateValue = typeof value === 'string' ? new Date(value) : value;
-                if (isNaN(dateValue.getTime())) {
+                // Check min/max constraints
+                if (fieldDef.min !== undefined && value < fieldDef.min) {
                     errors.push({
                         field: fieldName,
-                        message: `Field '${fieldName}' is not a valid date`,
+                        message: `Field '${fieldName}' must be at least ${fieldDef.min}`,
                         code: PipelineErrorCodes.FIELD_INVALID,
                         value,
                     });
                 }
-            }
-            break;
-
-        case 'enum':
-            if (typeof value !== 'string') {
-                errors.push({
-                    field: fieldName,
-                    message: `Field '${fieldName}' must be a string for enum type, got ${typeof value}`,
-                    code: PipelineErrorCodes.TYPE_MISMATCH,
-                    value,
-                });
-            } else if (fieldDef.enum && !fieldDef.enum.includes(value)) {
-                errors.push({
-                    field: fieldName,
-                    message: `Field '${fieldName}' must be one of: ${fieldDef.enum.join(', ')}. Got: ${value}`,
-                    code: PipelineErrorCodes.FIELD_INVALID,
-                    value,
-                });
+                if (fieldDef.max !== undefined && value > fieldDef.max) {
+                    errors.push({
+                        field: fieldName,
+                        message: `Field '${fieldName}' must be at most ${fieldDef.max}`,
+                        code: PipelineErrorCodes.FIELD_INVALID,
+                        value,
+                    });
+                }
             }
             break;
 

@@ -19,7 +19,7 @@ const complexSchema: Schema = {
         invoice_id: { type: 'string', pattern: '^INV-\\d{4}-\\d{4}$' },
         amount: { type: 'number', min: 0, max: 1000000 },
         currency: { type: 'string', enum: ['USD', 'EUR', 'GBP', 'JPY', 'SGD'] },
-        date: { type: 'date', optional: true },
+        date: { type: 'string', format: 'date-time', optional: true },
         items: { type: 'string', optional: true },
         tax_rate: { type: 'number', min: 0, max: 1, optional: true },
         discount: { type: 'number', min: 0, max: 1, optional: true },

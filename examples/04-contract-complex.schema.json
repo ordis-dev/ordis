@@ -5,11 +5,13 @@
       "description": "Contract identifier"
     },
     "start_date": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "description": "Contract start date in ISO format (YYYY-MM-DD)"
     },
     "end_date": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "description": "Contract end date in ISO format (YYYY-MM-DD)"
     },
     "duration_months": {

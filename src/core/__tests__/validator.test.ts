@@ -106,7 +106,7 @@ describe('Output Validator', () => {
         it('should validate enum values', () => {
             const schema: Schema = {
                 fields: {
-                    status: { type: 'enum', enum: ['active', 'inactive'] },
+                    status: { type: 'string', enum: ['active', 'inactive'] },
                 },
             };
 
@@ -114,24 +114,12 @@ describe('Output Validator', () => {
             expect(validateExtractedData({ status: 'pending' }, schema).valid).toBe(false);
         });
 
-        it('should validate date fields', () => {
-            const schema: Schema = {
-                fields: {
-                    date: { type: 'date' },
-                },
-            };
-
-            expect(validateExtractedData({ date: '2025-01-01' }, schema).valid).toBe(true);
-            expect(validateExtractedData({ date: new Date() }, schema).valid).toBe(true);
-            expect(validateExtractedData({ date: 'invalid-date' }, schema).valid).toBe(false);
-        });
-
         it('should collect multiple errors', () => {
             const schema: Schema = {
                 fields: {
                     name: { type: 'string' },
                     age: { type: 'number', min: 0 },
-                    status: { type: 'enum', enum: ['active', 'inactive'] },
+                    status: { type: 'string', enum: ['active', 'inactive'] },
                 },
             };
 

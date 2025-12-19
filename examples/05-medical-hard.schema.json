@@ -5,15 +5,18 @@
       "description": "Patient's last name only"
     },
     "patient_dob": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "description": "Patient date of birth in ISO format (YYYY-MM-DD)"
     },
     "encounter_date": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "description": "Date of this medical encounter in ISO format"
     },
     "surgery_date": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "description": "Date of the surgery mentioned (extract from s/p notation)"
     },
     "current_pain_level": {
@@ -33,7 +36,8 @@
       "description": "Number of physical therapy sessions remaining (calculate: 2x/week for 4 weeks)"
     },
     "follow_up_date": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "description": "Next appointment date in ISO format"
     },
     "physician_npi": {

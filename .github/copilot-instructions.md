@@ -41,6 +41,8 @@ examples/            # Sample schemas and input files
 - **Build**: `npm run build`
 - **Run**: `node dist/cli.js --help`
 - **Debug**: Use `--debug` flag for verbose output
+- **Test**: `npm test` (must pass before committing)
+- **Benchmark**: `npm run benchmark` (run after tests, before committing to verify performance)
 
 ## Conventions
 

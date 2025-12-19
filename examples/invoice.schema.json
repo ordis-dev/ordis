@@ -18,7 +18,8 @@
       "description": "Currency code"
     },
     "date": {
-      "type": "date",
+      "type": "string",
+      "format": "date-time",
       "optional": true,
       "description": "Invoice date"
     }

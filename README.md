@@ -38,7 +38,7 @@ ordis extract \
     "invoice_id": { "type": "string" },
     "amount": { "type": "number" },
     "currency": { "type": "string", "enum": ["USD", "SGD", "EUR"] },
-    "date": { "type": "date", "optional": true }
+    "date": { "type": "string", "format": "date-time", "optional": true }
   }
 }
 ```
