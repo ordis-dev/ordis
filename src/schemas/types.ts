@@ -17,6 +17,7 @@ export interface FieldDefinition {
     type: FieldType;
     description?: string;
     optional?: boolean;
+    format?: string;
     enum?: string[];
     min?: number;
     max?: number;

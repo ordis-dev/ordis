@@ -139,18 +139,18 @@ function validateField(
                 });
             } else {
                 // Check min/max constraints
-                if (field.min !== undefined && value < field.min) {
+                if (fieldDef.min !== undefined && value < fieldDef.min) {
                     errors.push({
                         field: fieldName,
-                        message: `Field '${fieldName}' must be at least ${field.min}`,
+                        message: `Field '${fieldName}' must be at least ${fieldDef.min}`,
                         code: PipelineErrorCodes.FIELD_INVALID,
                         value,
                     });
                 }
-                if (field.max !== undefined && value > field.max) {
+                if (fieldDef.max !== undefined && value > fieldDef.max) {
                     errors.push({
                         field: fieldName,
-                        message: `Field '${fieldName}' must be at most ${field.max}`,
+                        message: `Field '${fieldName}' must be at most ${fieldDef.max}`,
                         code: PipelineErrorCodes.FIELD_INVALID,
                         value,
                     });
