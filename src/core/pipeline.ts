@@ -5,6 +5,7 @@
 import { LLMClient } from '../llm/client.js';
 import { validateExtractedData } from './validator.js';
 import { PipelineError, PipelineErrorCodes } from './errors.js';
+import { preprocessWithDetails } from './preprocessor.js';
 import type { ExtractionRequest, PipelineResult, StepResult } from './types.js';
 
 /**
@@ -25,6 +26,20 @@ export class ExtractionPipeline {
         const steps: StepResult[] = [];
 
         try {
+            // Step 0: Preprocess input (if configured)
+            let processedInput = request.input;
+            if (request.preprocessing) {
+                const preprocessStep = this.recordStep('preprocess', () => {
+                    return preprocessWithDetails(request.input, request.preprocessing);
+                });
+                steps.push(preprocessStep);
+
+                if (preprocessStep.success && preprocessStep.data) {
+                    const result = preprocessStep.data as { text: string; wasProcessed: boolean };
+                    processedInput = result.text;
+                }
+            }
+
             // Step 1: Create LLM client
             const clientStep = this.recordStep('create_client', () => {
                 return new LLMClient(request.llmConfig);
@@ -45,7 +60,7 @@ export class ExtractionPipeline {
             const extractStep = await this.recordStepAsync('llm_extract', async () => {
                 return await client.extract({
                     schema: request.schema,
-                    input: request.input,
+                    input: processedInput,
                 });
             });
             steps.push(extractStep);

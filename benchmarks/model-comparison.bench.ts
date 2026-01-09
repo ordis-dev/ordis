@@ -44,6 +44,14 @@ const EXAMPLES = [
     {
         name: '05-medical-hard',
         difficulty: 'Hard'
+    },
+    {
+        name: '06-contract-html-hard',
+        difficulty: 'Hard-HTML'
+    },
+    {
+        name: '07-medical-html-hard',
+        difficulty: 'Hard-HTML'
     }
 ];
 

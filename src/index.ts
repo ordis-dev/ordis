@@ -7,11 +7,20 @@
 export { ExtractionPipeline, extract } from './core/pipeline.js';
 export { validateExtractedData } from './core/validator.js';
 export { PipelineError, PipelineErrorCodes } from './core/errors.js';
+export {
+    stripHtml,
+    preprocess,
+    preprocessWithDetails,
+    resolveHtmlStripOptions,
+} from './core/preprocessor.js';
+export type { PreprocessResult } from './core/preprocessor.js';
 export type {
     PipelineConfig,
     ExtractionRequest,
     PipelineResult,
     StepResult,
+    HtmlStripOptions,
+    PreprocessingConfig,
 } from './core/types.js';
 
 // Schema exports

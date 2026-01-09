@@ -6,6 +6,28 @@ import type { Schema } from '../schemas/types.js';
 import type { LLMConfig } from '../llm/types.js';
 
 /**
+ * HTML stripping options for preprocessing
+ */
+export interface HtmlStripOptions {
+    /** Keep text content only (default: true) */
+    extractText?: boolean;
+    /** Preserve semantic structure like headings, lists (converts to markdown-like format) */
+    preserveStructure?: boolean;
+    /** Remove specific CSS selectors (e.g., 'nav', 'footer', '.ad', '#sidebar') */
+    removeSelectors?: string[];
+    /** Max content length after stripping (truncates if exceeded) */
+    maxLength?: number;
+}
+
+/**
+ * Preprocessing configuration for input text
+ */
+export interface PreprocessingConfig {
+    /** Strip HTML tags from input. When true, uses default options. */
+    stripHtml?: boolean | HtmlStripOptions;
+}
+
+/**
  * Pipeline configuration
  */
 export interface PipelineConfig {
@@ -22,6 +44,8 @@ export interface ExtractionRequest {
     input: string;
     schema: Schema;
     llmConfig: LLMConfig;
+    /** Optional preprocessing configuration */
+    preprocessing?: PreprocessingConfig;
     debug?: boolean;
 }
 

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Portal - Emma Morrison | HealthCare EHR</title>
+    <style>
+        :root { --primary: #0066cc; --secondary: #f5f5f5; }
+        .header-bar { background: var(--primary); color: white; padding: 15px; }
+        .patient-card { border: 1px solid #ddd; padding: 20px; }
+        .vitals-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+        .alert-banner { background: #fff3cd; padding: 10px; }
+        .sidebar-ads { width: 200px; }
+        .ehr-content { margin: 0 220px 0 0; }
+    </style>
+    <script>
+        var patientMRN = "H-9823-4471";
+        var encounterDate = new Date("2024-12-14");
+        var sessionTimeout = 1800;
+        function checkSession() { /* session check */ }
+        setInterval(checkSession, 60000);
+    </script>
+</head>
+<body>
+    <header class="header-bar">
+        <nav class="ehr-nav">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/patients">Patient List</a>
+            <a href="/schedule">Schedule</a>
+            <a href="/messages">Messages (3)</a>
+            <a href="/settings">Settings</a>
+        </nav>
+        <div class="provider-info">Dr. Sarah Chen | Orthopedic Surgery | Logged in since 8:45 AM</div>
+    </header>
+
+    <div class="alert-banner">
+        <strong>System Notice:</strong> Scheduled maintenance tonight 11 PM - 2 AM. Please save all work.
+    </div>
+
+    <nav class="patient-nav breadcrumb">
+        <a href="/patients">All Patients</a> &gt;
+        <a href="/patients/H-9823-4471">Morrison, Emma L.</a> &gt;
+        <span>Encounter 12/14/2024</span>
+    </nav>
+
+    <aside class="sidebar-ads">
+        <div class="ad-widget">
+            <h4>CME Opportunity</h4>
+            <p>Earn 20 credits: Advances in Arthroscopic Surgery</p>
+            <a href="/cme/ortho-2024">Register Now</a>
+        </div>
+        <div class="ad-widget">
+            <h4>New Feature</h4>
+            <p>Try our AI-powered clinical decision support!</p>
+        </div>
+    </aside>
+
+    <main class="ehr-content">
+        <article class="encounter-note">
+            <header class="patient-header">
+                <h1>Clinical Encounter</h1>
+                <div class="patient-demographics">
+                    <span class="patient-name"><strong>PATIENT:</strong> Morrison, Emma L.</span> |
+                    <span class="patient-dob"><strong>DOB:</strong> 04/23/1987</span> |
+                    <span class="patient-mrn"><strong>MRN:</strong> H-9823-4471</span>
+                </div>
+            </header>
+
+            <section class="encounter-info">
+                <h2>Encounter Details</h2>
+                <p><strong>ENCOUNTER DATE:</strong> December 14, 2024</p>
+                <p><strong>CHIEF COMPLAINT:</strong> Follow-up post-op, left knee arthroscopy</p>
+            </section>
+
+            <section class="vitals">
+                <h2>Vital Signs</h2>
+                <div class="vitals-grid">
+                    <div class="vital-item">
+                        <label>Blood Pressure</label>
+                        <span class="vital-value">128/82</span>
+                    </div>
+                    <div class="vital-item">
+                        <label>Heart Rate</label>
+                        <span class="vital-value">74 bpm</span>
+                    </div>
+                    <div class="vital-item">
+                        <label>Temperature</label>
+                        <span class="vital-value">98.4°F</span>
+                    </div>
+                    <div class="vital-item">
+                        <label>O2 Saturation</label>
+                        <span class="vital-value">98%</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="history">
+                <h2>History</h2>
+                <p>Pt is s/p arthroscopic meniscectomy (CPT 29881) on 11/20/24. Reports mild pain (3/10), decreased from 7/10 at last visit. ROM improving. No erythema, warmth, or drainage noted. Sutures removed today.</p>
+            </section>
+
+            <section class="assessment">
+                <h2>Assessment</h2>
+                <p>Post-op recovery progressing well. Pain control adequate w/ OTC analgesics.</p>
+            </section>
+
+            <section class="plan">
+                <h2>Plan</h2>
+                <ul>
+                    <li>Continue PT 2x/week × 4 more weeks</li>
+                    <li>F/u in 6 wks or PRN</li>
+                    <li>RTC immediately if increased pain, swelling, or fever >101°F</li>
+                    <li>May resume light jogging in 3-4 weeks per PT clearance</li>
+                </ul>
+            </section>
+
+            <section class="medications">
+                <h2>Medications</h2>
+                <ul class="med-list">
+                    <li>Ibuprofen 400mg PO q6h PRN pain</li>
+                    <li>D/C Norco (was 5/325mg q4-6h PRN)</li>
+                </ul>
+            </section>
+
+            <section class="followup">
+                <h2>Follow-up</h2>
+                <p><strong>Next appt:</strong> 01/25/2025 @ 10:00 AM</p>
+            </section>
+
+            <footer class="signature-block">
+                <p class="provider-sig">
+                    <strong>Dr. Sarah Chen, MD</strong> (NPI: 1234567890)<br>
+                    Orthopedic Surgery
+                </p>
+                <p class="timestamp">Electronically signed on 12/14/2024 at 2:45 PM</p>
+            </footer>
+        </article>
+    </main>
+
+    <aside class="quick-actions">
+        <h3>Quick Actions</h3>
+        <button onclick="printNote()">Print Note</button>
+        <button onclick="sendToPatient()">Send to Patient Portal</button>
+        <button onclick="addAddendum()">Add Addendum</button>
+    </aside>
+
+    <footer class="ehr-footer">
+        <nav>
+            <a href="/help">Help</a>
+            <a href="/feedback">Submit Feedback</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/hipaa">HIPAA Compliance</a>
+        </nav>
+        <p>&copy; 2024 HealthCare EHR Systems. Version 12.4.1</p>
+    </footer>
+
+    <div class="idle-warning" id="session-timeout" style="display:none;">
+        <p>Your session will expire in 5 minutes. Click to continue.</p>
+        <button onclick="extendSession()">Stay Logged In</button>
+    </div>
+
+    <div class="cookie-consent" id="cookie-notice">
+        <p>This site uses cookies for security and analytics. <a href="/cookies">Cookie Policy</a></p>
+        <button>Accept</button>
+    </div>
+
+    <script>
+        function printNote() { window.print(); }
+        function sendToPatient() { /* API call */ }
+        function addAddendum() { window.location = '/addendum/new'; }
+        function extendSession() { /* extend */ }
+        // Analytics
+        var _gaq = _gaq || [];
+        _gaq.push(['_setAccount', 'UA-XXXXX-X']);
+    </script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+  "fields": {
+    "patient_last_name": {
+      "type": "string",
+      "description": "Patient's last name only"
+    },
+    "patient_dob": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Patient date of birth in ISO format (YYYY-MM-DD)"
+    },
+    "encounter_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date of this medical encounter in ISO format"
+    },
+    "surgery_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date of the surgery mentioned (extract from s/p notation)"
+    },
+    "current_pain_level": {
+      "type": "number",
+      "description": "Current pain level on 0-10 scale"
+    },
+    "previous_pain_level": {
+      "type": "number",
+      "description": "Previous pain level on 0-10 scale"
+    },
+    "blood_pressure_systolic": {
+      "type": "number",
+      "description": "Systolic blood pressure (top number)"
+    },
+    "pt_sessions_remaining": {
+      "type": "number",
+      "description": "Number of physical therapy sessions remaining (calculate: 2x/week for 4 weeks)"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Next appointment date in ISO format"
+    },
+    "physician_npi": {
+      "type": "string",
+      "description": "Physician's NPI number"
+    }
+  },
+  "confidence": {
+    "threshold": 75,
+    "failOnLowConfidence": true
+  },
+  "metadata": {
+    "name": "Medical HTML Extraction",
+    "version": "1.0.0",
+    "description": "Hard: Extract medical data from EHR HTML with navigation, ads, session banners, and boilerplate"
+  }
+}

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contract Portal - TechStart Inc.</title>
+    <style>
+        .container { max-width: 1200px; margin: 0 auto; }
+        .sidebar { width: 250px; float: left; }
+        .nav-menu a { display: block; padding: 10px; }
+        .contract-details { margin-left: 270px; }
+        .ad-banner { background: #f0f0f0; padding: 20px; }
+        .cookie-notice { position: fixed; bottom: 0; }
+    </style>
+    <script>
+        var trackingId = "UA-12345678-1";
+        var contractView = { id: "SA-2024-Q4-00789", viewed: true };
+        function initAnalytics() { console.log("Tracking..."); }
+        window.onload = initAnalytics;
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="main-nav">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/contracts">Contracts</a></li>
+                <li><a href="/billing">Billing</a></li>
+                <li><a href="/support">Support</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="user-info">Welcome, John Smith | Account #ACC-9921</div>
+    </header>
+
+    <aside class="sidebar">
+        <div class="sidebar-menu">
+            <h3>Quick Links</h3>
+            <a href="/contracts/new">New Contract</a>
+            <a href="/contracts/templates">Templates</a>
+            <a href="/contracts/archive">Archive</a>
+        </div>
+        <div class="ad-banner">
+            <p>Upgrade to Premium! Get 50% off annual plans.</p>
+            <button class="cta-button">Learn More</button>
+        </div>
+    </aside>
+
+    <main class="contract-details">
+        <article class="contract-document">
+            <h1>SERVICE AGREEMENT #SA-2024-Q4-00789</h1>
+            
+            <section class="parties">
+                <p>This Agreement is entered into on the 3rd day of November, 2024, between:</p>
+                
+                <div class="party client-info">
+                    <strong>CLIENT:</strong> TechStart Inc. (EIN: 12-3456789)
+                </div>
+                <div class="party vendor-info">
+                    <strong>VENDOR:</strong> CloudServe Solutions LLC (EIN: 98-7654321)
+                </div>
+            </section>
+
+            <section class="terms">
+                <h2>Contract Term</h2>
+                <p>This agreement commences on <span class="date">2024-11-15</span> and continues for eighteen (18) months, terminating on <span class="date">2026-05-14</span> unless renewed.</p>
+            </section>
+
+            <section class="fees">
+                <h2>Fees and Payment</h2>
+                <p>Client agrees to pay Vendor as follows:</p>
+                <ul class="fee-list">
+                    <li>Setup fee (one-time): $2,500.00</li>
+                    <li>Monthly recurring: $850.00 per month</li>
+                    <li>Overage charges: $0.15 per GB over 500GB monthly limit</li>
+                </ul>
+                <p><strong>PAYMENT TERMS:</strong> Net 15 days from invoice date. Late payments subject to 1.5% monthly interest.</p>
+            </section>
+
+            <section class="termination">
+                <h2>Termination</h2>
+                <p>Either party may terminate with 60 days written notice.</p>
+            </section>
+
+            <section class="signatures">
+                <p>Signed: [Digital signature present]</p>
+            </section>
+        </article>
+    </main>
+
+    <aside class="related-contracts">
+        <h3>Related Documents</h3>
+        <ul>
+            <li><a href="/contracts/SA-2024-Q3-00654">Previous Agreement (Q3)</a></li>
+            <li><a href="/amendments/AM-2024-001">Amendment #1</a></li>
+        </ul>
+    </aside>
+
+    <footer>
+        <div class="footer-nav">
+            <a href="/privacy">Privacy Policy</a>
+            <a href="/terms">Terms of Service</a>
+            <a href="/contact">Contact Us</a>
+        </div>
+        <p>&copy; 2024 ContractPortal Inc. All rights reserved.</p>
+    </footer>
+
+    <div class="cookie-notice" id="cookie-banner">
+        <p>We use cookies to improve your experience. <a href="/cookies">Learn more</a></p>
+        <button onclick="acceptCookies()">Accept All</button>
+        <button onclick="rejectCookies()">Reject</button>
+    </div>
+
+    <div class="newsletter-popup" id="subscribe-modal" style="display:none;">
+        <h3>Subscribe to Contract Updates</h3>
+        <input type="email" placeholder="your@email.com">
+        <button>Subscribe</button>
+    </div>
+
+    <script>
+        function acceptCookies() { document.getElementById('cookie-banner').style.display = 'none'; }
+        function rejectCookies() { document.getElementById('cookie-banner').style.display = 'none'; }
+        // More tracking code
+        var gtag = function() {};
+    </script>
+</body>
+</html>
