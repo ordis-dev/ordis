@@ -41,8 +41,13 @@ export class ExtractionPipeline {
             }
 
             // Step 1: Create LLM client
+            // Merge top-level maxContextTokens into llmConfig (top-level takes precedence)
+            const mergedLLMConfig = request.maxContextTokens
+                ? { ...request.llmConfig, maxContextTokens: request.maxContextTokens }
+                : request.llmConfig;
+
             const clientStep = this.recordStep('create_client', () => {
-                return new LLMClient(request.llmConfig);
+                return new LLMClient(mergedLLMConfig);
             });
             steps.push(clientStep);
 

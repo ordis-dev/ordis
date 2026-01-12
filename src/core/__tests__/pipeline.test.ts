@@ -375,4 +375,123 @@ describe('Extraction Pipeline', () => {
             expect(result.metadata.duration).toBeGreaterThanOrEqual(0);
         });
     });
+
+    describe('maxContextTokens parameter', () => {
+        it('should accept maxContextTokens as top-level parameter', async () => {
+            // Mock successful LLM response
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    choices: [{
+                        message: {
+                            content: JSON.stringify({
+                                data: { name: 'John' },
+                                confidence: 90,
+                                confidenceByField: { name: 90 },
+                            }),
+                        },
+                    }],
+                }),
+            });
+
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                },
+            };
+
+            const llmConfig: LLMConfig = {
+                baseURL: 'http://localhost:11434/v1',
+                model: 'llama3',
+            };
+
+            // Should not throw - maxContextTokens is accepted at top level
+            const result = await extract({
+                input: 'Name: John',
+                schema,
+                llmConfig,
+                maxContextTokens: 32768,
+            });
+
+            expect(result.success).toBe(true);
+        });
+
+        it('should use top-level maxContextTokens over llmConfig value', async () => {
+            // Mock successful LLM response
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    choices: [{
+                        message: {
+                            content: JSON.stringify({
+                                data: { name: 'John' },
+                                confidence: 90,
+                                confidenceByField: { name: 90 },
+                            }),
+                        },
+                    }],
+                }),
+            });
+
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                },
+            };
+
+            const llmConfig: LLMConfig = {
+                baseURL: 'http://localhost:11434/v1',
+                model: 'llama3',
+                maxContextTokens: 4096, // Small limit in llmConfig
+            };
+
+            // Top-level maxContextTokens should override llmConfig
+            const result = await extract({
+                input: 'Name: John',
+                schema,
+                llmConfig,
+                maxContextTokens: 32768, // Larger limit at top level
+            });
+
+            expect(result.success).toBe(true);
+        });
+
+        it('should still work with maxContextTokens in llmConfig', async () => {
+            // Mock successful LLM response
+            mockFetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({
+                    choices: [{
+                        message: {
+                            content: JSON.stringify({
+                                data: { name: 'John' },
+                                confidence: 90,
+                                confidenceByField: { name: 90 },
+                            }),
+                        },
+                    }],
+                }),
+            });
+
+            const schema: Schema = {
+                fields: {
+                    name: { type: 'string' },
+                },
+            };
+
+            const llmConfig: LLMConfig = {
+                baseURL: 'http://localhost:11434/v1',
+                model: 'llama3',
+                maxContextTokens: 32768, // Nested in llmConfig still works
+            };
+
+            const result = await extract({
+                input: 'Name: John',
+                schema,
+                llmConfig,
+            });
+
+            expect(result.success).toBe(true);
+        });
+    });
 });

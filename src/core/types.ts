@@ -46,6 +46,8 @@ export interface ExtractionRequest {
     llmConfig: LLMConfig;
     /** Optional preprocessing configuration */
     preprocessing?: PreprocessingConfig;
+    /** Maximum context tokens (overrides llmConfig.maxContextTokens) */
+    maxContextTokens?: number;
     debug?: boolean;
 }
 
