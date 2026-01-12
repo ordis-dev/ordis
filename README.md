@@ -217,6 +217,19 @@ npm run benchmark
 
 ## Roadmap
 
+**Completed in v0.4.0:**
+- ✅ User-friendly error messages ([#63](https://github.com/ordis-dev/ordis/issues/63))
+  - Emoji indicators (❌, 💡, ℹ️) for quick scanning
+  - Expected vs. actual values for validation errors
+  - Actionable suggestions for common issues
+  - Service-specific troubleshooting (Ollama, LM Studio, OpenAI)
+  - File system error handling (ENOENT, EACCES)
+- ✅ Debug mode enhancements
+  - Full LLM request/response logging
+  - Token usage breakdown
+  - System and user prompt visibility
+  - Detailed error context
+
 **Completed in v0.2.0:**
 - ✅ HTML stripping/preprocessing before extraction ([#59](https://github.com/ordis-dev/ordis/issues/59))
   - `stripHtml: true` removes HTML tags, keeps text content
@@ -234,6 +247,7 @@ npm run benchmark
 - ✅ Support for any OpenAI-compatible API
 
 **Upcoming:**
+- [ ] Schema validation error line numbers ([#64](https://github.com/ordis-dev/ordis/issues/64))
 - [ ] Smart input truncation ([#40](https://github.com/ordis-dev/ordis/issues/40))
 - [ ] Multi-pass extraction for large inputs ([#41](https://github.com/ordis-dev/ordis/issues/41))
 - [ ] Config file support ([#16](https://github.com/ordis-dev/ordis/issues/16))
