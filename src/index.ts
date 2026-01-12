@@ -13,6 +13,12 @@ export {
     preprocessWithDetails,
     resolveHtmlStripOptions,
 } from './core/preprocessor.js';
+export {
+    formatError,
+    formatValidationError,
+    formatValidationErrors,
+    formatLLMError,
+} from './core/error-formatter.js';
 export type { PreprocessResult } from './core/preprocessor.js';
 export type {
     PipelineConfig,

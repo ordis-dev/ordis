@@ -239,8 +239,22 @@ export class LLMClient {
         const details: Record<string, unknown> = {};
 
         try {
-            const errorData = await response.json() as { error?: { message?: string } };
-            errorMessage = errorData.error?.message || errorMessage;
+            const errorData = await response.json() as { error?: { message?: string; type?: string } };
+            const rawMessage = errorData.error?.message || errorMessage;
+            errorMessage = rawMessage;
+            
+            // Detect context window/token limit errors from various providers
+            const msgLower = rawMessage.toLowerCase();
+            if (msgLower.includes('context length') || 
+                msgLower.includes('maximum context') ||
+                msgLower.includes('context_length_exceeded') ||
+                msgLower.includes('token limit') ||
+                msgLower.includes('too many tokens') ||
+                msgLower.includes('prompt is too long') ||
+                (msgLower.includes('context') && msgLower.includes('exceed'))) {
+                errorCode = LLMErrorCodes.TOKEN_LIMIT_EXCEEDED;
+                details.originalMessage = rawMessage;
+            }
         } catch {
             // If we can't parse error JSON, use status text
         }
