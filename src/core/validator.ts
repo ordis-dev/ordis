@@ -6,10 +6,12 @@ import type { Schema, FieldDefinition } from '../schemas/types.js';
 import { PipelineError, PipelineErrorCodes } from './errors.js';
 
 export interface ValidationError {
-    field: string;
+    field?: string;
     message: string;
     code: string;
     value?: unknown;
+    expected?: unknown;  // Expected type or value(s)
+    actual?: unknown;    // Actual type or value received
 }
 
 export interface ValidationResult {

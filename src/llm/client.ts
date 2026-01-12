@@ -61,8 +61,13 @@ export class LLMClient {
         const usage = this.tokenCounter.calculateUsage(system, user);
         
         // Debug logging if enabled
-        if (this.config.debugTokens) {
-            console.error('[Token Usage]\n' + this.tokenCounter.formatUsage(usage));
+        if (this.config.debug || this.config.debugTokens) {
+            console.error('[DEBUG] Token Usage:\n' + this.tokenCounter.formatUsage(usage));
+        }
+
+        if (this.config.debug) {
+            console.error('[DEBUG] System Prompt:\n' + system);
+            console.error('[DEBUG] User Prompt:\n' + user.substring(0, 500) + (user.length > 500 ? '...' : ''));
         }
 
         // Error if over limit
@@ -93,6 +98,10 @@ export class LLMClient {
 
         // Call API with retries
         const response = await this.chatWithRetry(request);
+
+        if (this.config.debug) {
+            console.error('[DEBUG] LLM Response:\n' + JSON.stringify(response, null, 2));
+        }
 
         // Parse response
         return this.parseExtractionResponse(response);

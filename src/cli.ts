@@ -159,6 +159,7 @@ async function runExtraction(args: CliArgs): Promise<void> {
             baseURL: args.base,
             model: args.model,
             ...(args.apiKey && { apiKey: args.apiKey }),
+            debug: args.debug,
         };
 
         if (args.debug) {

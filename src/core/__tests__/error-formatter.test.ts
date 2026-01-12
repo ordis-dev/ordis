@@ -106,7 +106,7 @@ describe('error-formatter', () => {
         it('formats error without field name', () => {
             const error: ValidationError = {
                 message: 'Overall validation failed',
-                code: PipelineErrorCodes.VALIDATION_FAILED,
+                code: PipelineErrorCodes.VALIDATION_ERROR,
             };
 
             const formatted = formatValidationError(error);
@@ -184,6 +184,7 @@ describe('error-formatter', () => {
             const error = new LLMError(
                 'Network request failed',
                 LLMErrorCodes.NETWORK_ERROR,
+                undefined,
                 { cause: new Error('ECONNREFUSED') }
             );
 
@@ -224,6 +225,7 @@ describe('error-formatter', () => {
             const error = new LLMError(
                 'Context length exceeded',
                 LLMErrorCodes.TOKEN_LIMIT_EXCEEDED,
+                undefined,
                 {
                     details: {
                         promptTokens: 5000,
@@ -270,6 +272,7 @@ describe('error-formatter', () => {
             const error = new LLMError(
                 'API error occurred',
                 LLMErrorCodes.API_ERROR,
+                500,
                 { details: { statusCode: 500 } }
             );
 
@@ -296,7 +299,7 @@ describe('error-formatter', () => {
         it('formats SchemaValidationError', () => {
             const error = new SchemaValidationError(
                 'Invalid schema format',
-                SchemaErrorCodes.INVALID_SCHEMA,
+                SchemaErrorCodes.INVALID_FIELD_TYPE,
                 'name'
             );
 

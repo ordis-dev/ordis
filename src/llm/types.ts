@@ -45,6 +45,8 @@ export interface LLMConfig {
     warnThreshold?: number;
     /** Enable debug logging for token usage */
     debugTokens?: boolean;
+    /** Enable verbose debug output (shows full request/response) */
+    debug?: boolean;
 }
 
 /**

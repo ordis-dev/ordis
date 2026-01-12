@@ -24,7 +24,7 @@ export function formatValidationError(
     schema?: Schema,
     value?: unknown
 ): string {
-    const field = schema?.fields?.[error.field];
+    const field = error.field ? schema?.fields?.[error.field] : undefined;
     const fieldDesc = field?.description ? ` (${field.description})` : '';
     
     const formatted: FormattedError = {
@@ -347,6 +347,17 @@ export function formatError(
     // Handle FormattedError
     if ('title' in error && 'message' in error) {
         return formatFormattedError(error as FormattedError);
+    }
+
+    // Handle common Node.js errors
+    if (error instanceof Error && 'code' in error) {
+        const nodeError = error as any;
+        if (nodeError.code === 'ENOENT') {
+            const path = nodeError.path || 'file';
+            return `❌ File Not Found\n   Cannot find: ${path}\n\n💡 Tip:\n   • Check the file path is correct\n   • Verify the file exists\n   • Use absolute path or check current directory`;
+        } else if (nodeError.code === 'EACCES' || nodeError.code === 'EPERM') {
+            return `❌ Permission Denied\n   ${error.message}\n\n💡 Tip:\n   • Check file permissions\n   • Make sure you have read access\n   • Try running with appropriate permissions`;
+        }
     }
 
     // Handle generic Error
