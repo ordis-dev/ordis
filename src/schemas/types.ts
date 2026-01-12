@@ -47,10 +47,12 @@ export interface Schema {
  * Validation error for a specific field
  */
 export interface ValidationError {
-    field: string;
+    field?: string;
     message: string;
     code: string;
     value?: unknown;
+    expected?: unknown;  // Expected type or value(s)
+    actual?: unknown;    // Actual type or value received
     confidence?: number; // Confidence score (0-100) if available
 }
 

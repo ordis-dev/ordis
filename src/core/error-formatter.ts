@@ -45,32 +45,52 @@ export function formatValidationError(
             break;
 
         case PipelineErrorCodes.TYPE_MISMATCH:
-            const expectedType = field?.type || 'unknown';
-            const gotType = typeof error.value;
+            // Use expected/actual from error if provided, otherwise infer from schema
+            const expectedType = (error.expected as string) || field?.type || 'unknown';
+            const actualType = (error.actual as string) || typeof error.value;
             const gotValue = JSON.stringify(error.value);
             
             formatted.message = `Field '${error.field}'${fieldDesc}\n` +
                                `  Expected: ${expectedType}\n` +
-                               `  Got: ${gotValue} (${gotType})`;
+                               `  Got: ${gotValue} (${actualType})`;
             
             // Type-specific suggestions
-            if (expectedType === 'number' && gotType === 'string') {
+            if (expectedType === 'number' && actualType === 'string') {
                 formatted.suggestion = `The LLM returned a string instead of a number.\n` +
                                      `  • Check if the value contains formatting (e.g., "$1,250.00")\n` +
                                      `  • Update schema description to request "raw number without formatting"\n` +
                                      `  • Example: "amount as a number (e.g., 1250, not $1,250.00)"`;
-            } else if (expectedType === 'string' && gotType === 'number') {
+            } else if (expectedType === 'string' && actualType === 'number') {
                 formatted.suggestion = `The LLM returned a number instead of a string.\n` +
                                      `  • Update schema to use type: "number" if numeric data is expected\n` +
                                      `  • Or clarify in description that quotes are required`;
-            } else if (expectedType === 'integer' && gotType === 'number') {
+            } else if (expectedType === 'integer' && actualType === 'number') {
                 formatted.suggestion = `Got a decimal number but expected an integer.\n` +
                                      `  • Ask for "whole number" or "integer" in the field description`;
             }
             break;
 
         case PipelineErrorCodes.FIELD_INVALID:
-            if (field?.enum) {
+            // Check if expected is an array (enum values) or string (pattern)
+            const expectedValue = error.expected;
+            if (Array.isArray(expectedValue)) {
+                // Enum validation error
+                formatted.message = `Field '${error.field}' has invalid value\n` +
+                                   `  Allowed: ${expectedValue.join(', ')}\n` +
+                                   `  Got: ${JSON.stringify(error.value)}`;
+                formatted.suggestion = `The LLM returned a value not in the allowed list.\n` +
+                                     `  • Add the value to the enum list if it's valid\n` +
+                                     `  • Provide examples in the field description\n` +
+                                     `  • Use pattern matching if exact values aren't required`;
+            } else if (typeof expectedValue === 'string' && expectedValue.startsWith('^')) {
+                // Pattern validation error
+                formatted.message = `Field '${error.field}' doesn't match required pattern\n` +
+                                   `  Pattern: ${expectedValue}\n` +
+                                   `  Got: ${JSON.stringify(error.value)}`;
+                formatted.suggestion = `The value doesn't match the regex pattern.\n` +
+                                     `  • Provide an example in the field description\n` +
+                                     `  • Simplify the pattern if it's too strict`;
+            } else if (field?.enum) {
                 formatted.message = `Field '${error.field}' has invalid value\n` +
                                    `  Allowed: ${field.enum.join(', ')}\n` +
                                    `  Got: ${JSON.stringify(error.value)}`;
@@ -90,6 +110,9 @@ export function formatValidationError(
                 formatted.suggestion = `Value is out of the allowed range.\n` +
                                      `  • Check if the constraint is correct\n` +
                                      `  • Mention the range in the field description`;
+            } else {
+                // Generic field invalid error
+                formatted.message = error.message;
             }
             break;
 
