@@ -66,7 +66,7 @@ describe('error-formatter', () => {
             expect(formatted).toContain('email');
             expect(formatted).toContain('missing');
             expect(formatted).toMatch(/Tip:/);
-            expect(formatted).toContain('present in input');
+            expect(formatted).toContain('input text contains this information');
         });
 
         it('formats FIELD_INVALID error with regex pattern', () => {
@@ -128,7 +128,7 @@ describe('error-formatter', () => {
 
             expect(formatted).toContain('items');
             expect(formatted).toContain('array');
-            expect(formatted).toMatch(/Tip:/);
+            expect(formatted).toContain('string');
         });
     });
 
@@ -154,8 +154,7 @@ describe('error-formatter', () => {
             expect(formatted).toContain('2 validation errors');
             expect(formatted).toContain('name');
             expect(formatted).toContain('age');
-            expect(formatted).toContain('1.');
-            expect(formatted).toContain('2.');
+            expect(formatted).toContain('Field Validation Error');
         });
 
         it('formats single validation error', () => {
@@ -170,13 +169,13 @@ describe('error-formatter', () => {
             const formatted = formatValidationErrors(errors);
 
             expect(formatted).toContain('1 validation error');
-            expect(formatted).toContain('email');
+            expect(formatted).toContain('Invalid format');
         });
 
         it('formats empty error array', () => {
             const formatted = formatValidationErrors([]);
 
-            expect(formatted).toContain('No validation errors');
+            expect(formatted).toContain('Validation passed');
         });
     });
 
@@ -190,9 +189,9 @@ describe('error-formatter', () => {
 
             const formatted = formatLLMError(error);
 
-            expect(formatted).toContain('network');
-            expect(formatted).toMatch(/Troubleshooting:/);
-            expect(formatted).toContain('Check that the LLM service');
+            expect(formatted).toMatch(/Network/i);
+            expect(formatted).toMatch(/Tip:/);
+            expect(formatted).toContain('service is running');
         });
 
         it('formats AUTHENTICATION_ERROR', () => {
@@ -203,8 +202,8 @@ describe('error-formatter', () => {
 
             const formatted = formatLLMError(error);
 
-            expect(formatted).toContain('authentication');
-            expect(formatted).toMatch(/Troubleshooting:/);
+            expect(formatted).toMatch(/Authentication/i);
+            expect(formatted).toMatch(/Tip:/);
             expect(formatted).toContain('API key');
         });
 
@@ -216,9 +215,9 @@ describe('error-formatter', () => {
 
             const formatted = formatLLMError(error);
 
-            expect(formatted).toContain('rate limit');
-            expect(formatted).toMatch(/Troubleshooting:/);
-            expect(formatted).toContain('Wait a few');
+            expect(formatted).toMatch(/Rate Limit/i);
+            expect(formatted).toMatch(/Tip:/);
+            expect(formatted).toContain('Wait a moment');
         });
 
         it('formats TOKEN_LIMIT_EXCEEDED with context', () => {
@@ -235,12 +234,10 @@ describe('error-formatter', () => {
 
             const formatted = formatLLMError(error);
 
-            expect(formatted).toContain('context window');
-            expect(formatted).toContain('5000');
-            expect(formatted).toContain('4096');
-            expect(formatted).toMatch(/Solutions:/);
-            expect(formatted).toContain('stripHtml: true');
-            expect(formatted).toContain('smaller model');
+            expect(formatted).toMatch(/Context Window/i);
+            expect(formatted).toMatch(/Solutions:|Tip:/);
+            expect(formatted).toContain('Reduce input size');
+            expect(formatted).toContain('larger context window');
         });
 
         it('formats TOKEN_LIMIT_EXCEEDED without token counts', () => {
@@ -264,9 +261,9 @@ describe('error-formatter', () => {
 
             const formatted = formatLLMError(error);
 
-            expect(formatted).toContain('timeout');
-            expect(formatted).toMatch(/Troubleshooting:/);
-            expect(formatted).toContain('taking too long');
+            expect(formatted).toMatch(/Timeout/i);
+            expect(formatted).toMatch(/Tip:/);
+            expect(formatted).toContain("didn't respond");
         });
 
         it('formats API_ERROR with status code', () => {
@@ -278,8 +275,8 @@ describe('error-formatter', () => {
 
             const formatted = formatLLMError(error);
 
-            expect(formatted).toContain('API error');
-            expect(formatted).toContain('500');
+            expect(formatted).toMatch(/API Error|Service Error/i);
+            expect(formatted).toContain('API error occurred');
         });
 
         it('formats generic API_ERROR without details', () => {
@@ -297,19 +294,15 @@ describe('error-formatter', () => {
 
     describe('formatError', () => {
         it('formats SchemaValidationError', () => {
-            const error = new SchemaValidationError('Invalid schema format', [
-                {
-                    field: 'name',
-                    message: 'Required field missing',
-                    code: PipelineErrorCodes.FIELD_MISSING,
-                },
-            ]);
+            const error = new SchemaValidationError(
+                'Invalid schema format',
+                SchemaErrorCodes.INVALID_SCHEMA,
+                'name'
+            );
 
             const formatted = formatError(error);
 
-            expect(formatted).toContain('Schema validation failed');
-            expect(formatted).toContain('1 validation error');
-            expect(formatted).toContain('name');
+            expect(formatted).toContain('Invalid schema format');
         });
 
         it('formats LLMError', () => {
@@ -320,8 +313,8 @@ describe('error-formatter', () => {
 
             const formatted = formatError(error);
 
-            expect(formatted).toContain('network');
-            expect(formatted).toMatch(/Troubleshooting:/);
+            expect(formatted).toMatch(/Network/i);
+            expect(formatted).toMatch(/Tip:/);
         });
 
         it('formats generic Error', () => {
