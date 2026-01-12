@@ -47,6 +47,15 @@ export interface LLMConfig {
     debugTokens?: boolean;
     /** Enable verbose debug output (shows full request/response) */
     debug?: boolean;
+    /** Ollama-specific options (e.g., num_ctx for context window) */
+    ollamaOptions?: {
+        /** Context window size in tokens (default varies by model) */
+        num_ctx?: number;
+        /** Number of tokens to keep from the prompt (default: 4) */
+        num_keep?: number;
+        /** Number of layers to run on GPU (-1 = all, 0 = none) */
+        num_gpu?: number;
+    };
 }
 
 /**
@@ -65,6 +74,12 @@ export interface LLMRequest {
     messages: ChatMessage[];
     temperature?: number;
     max_tokens?: number;
+    /** Ollama-specific options (passed through on Ollama endpoints) */
+    options?: {
+        num_ctx?: number;
+        num_keep?: number;
+        num_gpu?: number;
+    };
 }
 
 /**

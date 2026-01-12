@@ -121,7 +121,7 @@ describe('Schema System Integration', () => {
                 expect(err.message).toContain('text');
                 expect(err.field).toBe('name');
                 expect(err.code).toBe(ErrorCodes.INVALID_FIELD_TYPE);
-                expect(err.details?.validTypes).toEqual(['string', 'number', 'integer', 'boolean']);
+                expect(err.details?.validTypes).toEqual(['string', 'number', 'integer', 'boolean', 'array', 'object']);
             }
         });
 

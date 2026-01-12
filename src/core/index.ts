@@ -4,6 +4,7 @@
 
 export { ExtractionPipeline, extract } from './pipeline.js';
 export { validateExtractedData } from './validator.js';
+export { coerceValue, coerceExtractedData, coerceEnumValue, coerceDateValue } from './coercion.js';
 export { PipelineError, PipelineErrorCodes } from './errors.js';
 export {
     stripHtml,
@@ -20,3 +21,4 @@ export type {
     HtmlStripOptions,
     PreprocessingConfig,
 } from './types.js';
+export type { CoercionWarning, CoercionResult } from './coercion.js';

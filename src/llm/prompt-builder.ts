@@ -2,7 +2,70 @@
  * Prompt builder - generates prompts from schemas
  */
 
-import type { Schema } from '../schemas/types.js';
+import type { Schema, FieldDefinition, ObjectProperties } from '../schemas/types.js';
+
+/**
+ * Formats a field definition for the prompt
+ */
+function formatFieldDefinition(fieldName: string, fieldDef: FieldDefinition, indent: string = ''): string {
+    let text = `${indent}- ${fieldName}: ${fieldDef.type}`;
+    
+    if (fieldDef.optional) {
+        text += ' (optional)';
+    }
+    if (fieldDef.description) {
+        text += ` - ${fieldDef.description}`;
+    }
+    if (fieldDef.enum) {
+        text += ` - allowed values: ${fieldDef.enum.join(', ')}`;
+    }
+    if (fieldDef.min !== undefined || fieldDef.max !== undefined) {
+        const min = fieldDef.min !== undefined ? fieldDef.min : 'null';
+        const max = fieldDef.max !== undefined ? fieldDef.max : 'null';
+        text += ` - range: ${min} to ${max}`;
+    }
+    if (fieldDef.pattern) {
+        text += ` - pattern: ${fieldDef.pattern}`;
+    }
+
+    // Handle array type
+    if (fieldDef.type === 'array' && fieldDef.items) {
+        text += '\n' + formatArrayItems(fieldDef.items, indent + '  ');
+    }
+
+    // Handle object type
+    if (fieldDef.type === 'object' && fieldDef.properties) {
+        text += '\n' + formatObjectProperties(fieldDef.properties, indent + '  ');
+    }
+
+    return text;
+}
+
+/**
+ * Formats array items for the prompt
+ */
+function formatArrayItems(items: { type: string; properties?: ObjectProperties }, indent: string): string {
+    let text = `${indent}items (${items.type}):`;
+    
+    if (items.properties) {
+        text += '\n' + formatObjectProperties(items.properties, indent + '  ');
+    }
+
+    return text;
+}
+
+/**
+ * Formats object properties for the prompt
+ */
+function formatObjectProperties(properties: ObjectProperties, indent: string): string {
+    const lines: string[] = [];
+    
+    for (const [propName, propDef] of Object.entries(properties)) {
+        lines.push(formatFieldDefinition(propName, propDef, indent));
+    }
+
+    return lines.join('\n');
+}
 
 /**
  * Builds a system prompt for extraction
@@ -10,37 +73,32 @@ import type { Schema } from '../schemas/types.js';
 export function buildSystemPrompt(schema: Schema): string {
     const { fields, metadata, confidence, prompt } = schema;
 
+    // Check if schema has any array fields
+    const hasArrayFields = Object.values(fields).some(f => f.type === 'array');
+
     let promptText = `You are a structured data extraction system. Extract information from text according to the schema below.
 
 Rules:
 - Return only valid JSON (no markdown, no explanation)
 - Include a confidence score (0-100) for each field
 - Use null for missing or uncertain values
-- Include all fields in the response, even if null
+- Include all fields in the response, even if null`;
+
+    // Add array-specific instructions if schema has array fields
+    if (hasArrayFields) {
+        promptText += `
+- For array fields: extract ALL instances found in the text, do not skip any
+- For enum fields: use the exact values from the allowed values list`;
+    }
+
+    promptText += `
 
 Schema:
 `;
 
     // Add field definitions
     for (const [fieldName, fieldDef] of Object.entries(fields)) {
-        promptText += `\n- ${fieldName}: ${fieldDef.type}`;
-        if (fieldDef.optional) {
-            promptText += ' (optional)';
-        }
-        if (fieldDef.description) {
-            promptText += ` - ${fieldDef.description}`;
-        }
-        if (fieldDef.enum) {
-            promptText += ` - allowed values: ${fieldDef.enum.join(', ')}`;
-        }
-        if (fieldDef.min !== undefined || fieldDef.max !== undefined) {
-            const min = fieldDef.min !== undefined ? fieldDef.min : 'null';
-            const max = fieldDef.max !== undefined ? fieldDef.max : 'null';
-            promptText += ` - range: ${min} to ${max}`;
-        }
-        if (fieldDef.pattern) {
-            promptText += ` - pattern: ${fieldDef.pattern}`;
-        }
+        promptText += '\n' + formatFieldDefinition(fieldName, fieldDef);
     }
 
     // Add confidence requirements

@@ -1,0 +1,69 @@
+{
+  "fields": {
+    "company_name": {
+      "type": "string",
+      "description": "Name of the company"
+    },
+    "total_funding_usd": {
+      "type": "number",
+      "description": "Total funding raised in USD",
+      "optional": true
+    },
+    "funding_rounds": {
+      "type": "array",
+      "description": "List of funding rounds mentioned in the document",
+      "optional": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "round_type": {
+            "type": "string",
+            "description": "Type of funding round",
+            "enum": ["pre_seed", "seed", "series_a", "series_b", "series_c", "series_d", "other"]
+          },
+          "amount_usd": {
+            "type": "number",
+            "description": "Amount raised in USD",
+            "optional": true
+          },
+          "lead_investor": {
+            "type": "string",
+            "description": "Lead investor for this round",
+            "optional": true
+          },
+          "date": {
+            "type": "string",
+            "description": "Date of the funding round (ISO format)",
+            "format": "date",
+            "optional": true
+          }
+        }
+      }
+    },
+    "key_investors": {
+      "type": "array",
+      "description": "List of notable investors",
+      "optional": true,
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Investor name"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of investor",
+            "enum": ["vc", "angel", "corporate", "other"],
+            "optional": true
+          }
+        }
+      }
+    }
+  },
+  "metadata": {
+    "name": "Funding Rounds Schema",
+    "version": "1.0.0",
+    "description": "Extract funding round information from startup news articles"
+  }
+}

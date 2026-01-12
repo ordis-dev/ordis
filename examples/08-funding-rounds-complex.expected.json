@@ -1,0 +1,42 @@
+{
+  "company_name": "TechStartup Inc",
+  "total_funding_usd": 78000000,
+  "funding_rounds": [
+    {
+      "round_type": "seed",
+      "amount_usd": 3000000,
+      "lead_investor": null,
+      "date": "2023-01-01"
+    },
+    {
+      "round_type": "series_a",
+      "amount_usd": 15000000,
+      "lead_investor": "Andreessen Horowitz",
+      "date": "2024-06-01"
+    },
+    {
+      "round_type": "series_b",
+      "amount_usd": 60000000,
+      "lead_investor": "Sequoia Capital",
+      "date": "2026-01-12"
+    }
+  ],
+  "key_investors": [
+    {
+      "name": "Sequoia Capital",
+      "type": "vc"
+    },
+    {
+      "name": "Andreessen Horowitz",
+      "type": "vc"
+    },
+    {
+      "name": "First Round Capital",
+      "type": "vc"
+    },
+    {
+      "name": "Tiger Global Management",
+      "type": "vc"
+    }
+  ]
+}

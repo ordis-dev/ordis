@@ -5,7 +5,7 @@
 import type { Schema, FieldDefinition, FieldType } from './types.js';
 import { SchemaValidationError, ErrorCodes } from './errors.js';
 
-const VALID_FIELD_TYPES: FieldType[] = ['string', 'number', 'integer', 'boolean'];
+const VALID_FIELD_TYPES: FieldType[] = ['string', 'number', 'integer', 'boolean', 'array', 'object'];
 
 /**
  * Validates a schema definition
@@ -160,6 +160,14 @@ function validateFieldDefinition(fieldName: string, fieldDef: unknown): void {
             validateEnumConstraint(fieldName, def);
         }
     }
+
+    if (fieldType === 'array') {
+        validateArrayField(fieldName, def);
+    }
+
+    if (fieldType === 'object') {
+        validateObjectField(fieldName, def);
+    }
 }
 
 /**
@@ -284,6 +292,110 @@ function validateStringField(fieldName: string, def: Record<string, unknown>): v
             ErrorCodes.INVALID_CONSTRAINT,
             fieldName
         );
+    }
+}
+
+/**
+ * Validates array field definition
+ */
+function validateArrayField(fieldName: string, def: Record<string, unknown>): void {
+    // Array must have items definition
+    if (!def.items) {
+        throw new SchemaValidationError(
+            `Array field '${fieldName}' must have an 'items' property defining the array element type`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    if (typeof def.items !== 'object' || def.items === null) {
+        throw new SchemaValidationError(
+            `Array field '${fieldName}' items must be an object`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    const items = def.items as Record<string, unknown>;
+
+    // Currently only support object items
+    if (items.type !== 'object') {
+        throw new SchemaValidationError(
+            `Array field '${fieldName}' items type must be 'object'. Got: ${items.type}`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    // Validate the nested object properties
+    if (!items.properties) {
+        throw new SchemaValidationError(
+            `Array field '${fieldName}' items must have 'properties' defining the object structure`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    if (typeof items.properties !== 'object' || items.properties === null) {
+        throw new SchemaValidationError(
+            `Array field '${fieldName}' items properties must be an object`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    const properties = items.properties as Record<string, unknown>;
+
+    if (Object.keys(properties).length === 0) {
+        throw new SchemaValidationError(
+            `Array field '${fieldName}' items must have at least one property`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    // Validate each nested property
+    for (const [propName, propDef] of Object.entries(properties)) {
+        validateFieldName(propName);
+        validateFieldDefinition(`${fieldName}.items.${propName}`, propDef);
+    }
+}
+
+/**
+ * Validates object field definition
+ */
+function validateObjectField(fieldName: string, def: Record<string, unknown>): void {
+    // Object must have properties definition
+    if (!def.properties) {
+        throw new SchemaValidationError(
+            `Object field '${fieldName}' must have a 'properties' property defining the object structure`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    if (typeof def.properties !== 'object' || def.properties === null) {
+        throw new SchemaValidationError(
+            `Object field '${fieldName}' properties must be an object`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    const properties = def.properties as Record<string, unknown>;
+
+    if (Object.keys(properties).length === 0) {
+        throw new SchemaValidationError(
+            `Object field '${fieldName}' must have at least one property`,
+            ErrorCodes.INVALID_CONSTRAINT,
+            fieldName
+        );
+    }
+
+    // Validate each nested property
+    for (const [propName, propDef] of Object.entries(properties)) {
+        validateFieldName(propName);
+        validateFieldDefinition(`${fieldName}.${propName}`, propDef);
     }
 }
 

@@ -4,6 +4,7 @@
 
 import type { Schema, FieldDefinition } from '../schemas/types.js';
 import { PipelineError, PipelineErrorCodes } from './errors.js';
+import { coerceExtractedData, type CoercionWarning } from './coercion.js';
 
 export interface ValidationError {
     field?: string;
@@ -17,6 +18,8 @@ export interface ValidationError {
 export interface ValidationResult {
     valid: boolean;
     errors: ValidationError[];
+    warnings?: CoercionWarning[];  // Warnings from type coercion
+    coercedData?: Record<string, unknown>;  // Data after coercion
 }
 
 /**
@@ -28,9 +31,12 @@ export function validateExtractedData(
 ): ValidationResult {
     const errors: ValidationError[] = [];
 
-    // Check required fields
+    // Apply type coercion first
+    const { data: coercedData, warnings } = coerceExtractedData(data, schema.fields);
+
+    // Check required fields using coerced data
     for (const [fieldName, fieldDef] of Object.entries(schema.fields)) {
-        const value = data[fieldName];
+        const value = coercedData[fieldName];
 
         // Check if field is missing
         if (value === undefined || value === null) {
@@ -52,6 +58,8 @@ export function validateExtractedData(
     return {
         valid: errors.length === 0,
         errors,
+        warnings: warnings.length > 0 ? warnings : undefined,
+        coercedData,
     };
 }
 
@@ -170,6 +178,112 @@ function validateField(
                 });
             }
             break;
+
+        case 'array':
+            if (!Array.isArray(value)) {
+                errors.push({
+                    field: fieldName,
+                    message: `Field '${fieldName}' must be an array, got ${typeof value}`,
+                    code: PipelineErrorCodes.TYPE_MISMATCH,
+                    value,
+                });
+            } else if (fieldDef.items) {
+                // Validate each item in the array
+                for (let i = 0; i < value.length; i++) {
+                    const item = value[i];
+                    const itemErrors = validateArrayItem(
+                        `${fieldName}[${i}]`,
+                        item,
+                        fieldDef.items
+                    );
+                    errors.push(...itemErrors);
+                }
+            }
+            break;
+
+        case 'object':
+            if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+                errors.push({
+                    field: fieldName,
+                    message: `Field '${fieldName}' must be an object, got ${Array.isArray(value) ? 'array' : typeof value}`,
+                    code: PipelineErrorCodes.TYPE_MISMATCH,
+                    value,
+                });
+            } else if (fieldDef.properties) {
+                // Validate nested object properties
+                const objectErrors = validateObjectProperties(
+                    fieldName,
+                    value as Record<string, unknown>,
+                    fieldDef.properties
+                );
+                errors.push(...objectErrors);
+            }
+            break;
+    }
+
+    return errors;
+}
+
+/**
+ * Validates an array item (currently only supports object items)
+ */
+function validateArrayItem(
+    itemPath: string,
+    item: unknown,
+    itemDef: { type: string; properties?: Record<string, FieldDefinition> }
+): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    if (itemDef.type === 'object') {
+        if (typeof item !== 'object' || item === null || Array.isArray(item)) {
+            errors.push({
+                field: itemPath,
+                message: `${itemPath} must be an object, got ${Array.isArray(item) ? 'array' : typeof item}`,
+                code: PipelineErrorCodes.TYPE_MISMATCH,
+                value: item,
+            });
+        } else if (itemDef.properties) {
+            const objectErrors = validateObjectProperties(
+                itemPath,
+                item as Record<string, unknown>,
+                itemDef.properties
+            );
+            errors.push(...objectErrors);
+        }
+    }
+
+    return errors;
+}
+
+/**
+ * Validates nested object properties
+ */
+function validateObjectProperties(
+    parentPath: string,
+    obj: Record<string, unknown>,
+    properties: Record<string, FieldDefinition>
+): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    for (const [propName, propDef] of Object.entries(properties)) {
+        const value = obj[propName];
+        const propPath = `${parentPath}.${propName}`;
+
+        // Check if field is missing
+        if (value === undefined || value === null) {
+            if (!propDef.optional) {
+                errors.push({
+                    field: propPath,
+                    message: `Required field '${propPath}' is missing`,
+                    code: PipelineErrorCodes.FIELD_MISSING,
+                });
+            }
+            continue;
+        }
+
+        // Validate field type and constraints
+        const fieldErrors = validateField(propPath, value, propDef);
+        errors.push(...fieldErrors);
     }
 
     return errors;

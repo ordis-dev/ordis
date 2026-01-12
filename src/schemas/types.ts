@@ -8,7 +8,22 @@
  * Supported field types in schema definitions
  * Note: For dates, use type='string' with format='date-time'
  */
-export type FieldType = 'string' | 'number' | 'integer' | 'boolean';
+export type FieldType = 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'object';
+
+/**
+ * Object field properties (for nested objects)
+ */
+export interface ObjectProperties {
+    [key: string]: FieldDefinition;
+}
+
+/**
+ * Array items definition
+ */
+export interface ArrayItemDefinition {
+    type: 'object';
+    properties: ObjectProperties;
+}
 
 /**
  * Field definition within a schema
@@ -22,6 +37,10 @@ export interface FieldDefinition {
     min?: number;
     max?: number;
     pattern?: string;
+    /** For array type: definition of array items */
+    items?: ArrayItemDefinition;
+    /** For object type: nested properties */
+    properties?: ObjectProperties;
 }
 
 /**

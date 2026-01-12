@@ -96,6 +96,11 @@ export class LLMClient {
             max_tokens: this.config.maxTokens,
         };
 
+        // Add Ollama-specific options if configured
+        if (this.config.ollamaOptions) {
+            request.options = this.config.ollamaOptions;
+        }
+
         // Call API with retries
         const response = await this.chatWithRetry(request);
 

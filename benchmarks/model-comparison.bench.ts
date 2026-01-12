@@ -23,6 +23,16 @@ const MODELS = [
     'deepseek-r1:14b'     // Larger reasoning model - should be even more accurate
 ];
 
+// Model-specific configurations (e.g., larger context for high-VRAM setups)
+const MODEL_CONFIG: Record<string, Partial<LLMConfig>> = {
+    'deepseek-r1:14b': {
+        maxContextTokens: 32768,  // 32k context - Ordis token budget
+        ollamaOptions: {
+            num_ctx: 32768,       // 32k context - Ollama runtime setting
+        },
+    },
+};
+
 // Test examples
 const EXAMPLES = [
     {
@@ -52,6 +62,10 @@ const EXAMPLES = [
     {
         name: '07-medical-html-hard',
         difficulty: 'Hard-HTML'
+    },
+    {
+        name: '08-funding-rounds-complex',
+        difficulty: 'Complex-Arrays'
     }
 ];
 
@@ -213,6 +227,44 @@ async function ensureModelsAvailable(requiredModels: string[]): Promise<string[]
 }
 
 /**
+ * Stringify a value for comparison display
+ * Handles arrays and objects with JSON.stringify for readable output
+ */
+function stringifyValue(value: unknown): string {
+    if (value === null) return 'null';
+    if (value === undefined) return 'undefined';
+    if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+        return JSON.stringify(value);
+    }
+    return String(value);
+}
+
+/**
+ * Deep compare two values for equality
+ */
+function deepEqual(a: unknown, b: unknown): boolean {
+    if (a === b) return true;
+    if (typeof a !== typeof b) return false;
+    if (a === null || b === null) return a === b;
+    
+    if (Array.isArray(a) && Array.isArray(b)) {
+        if (a.length !== b.length) return false;
+        return a.every((item, i) => deepEqual(item, b[i]));
+    }
+    
+    if (typeof a === 'object' && typeof b === 'object') {
+        const aKeys = Object.keys(a as object);
+        const bKeys = Object.keys(b as object);
+        if (aKeys.length !== bKeys.length) return false;
+        return aKeys.every(key => 
+            deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])
+        );
+    }
+    
+    return false;
+}
+
+/**
  * Calculate accuracy by comparing extracted data to expected data
  */
 function calculateAccuracy(extracted: Record<string, unknown>, expected: Record<string, unknown>, confidenceByField?: Record<string, number>): { accuracy: number; issues: string[] } {
@@ -226,7 +278,8 @@ function calculateAccuracy(extracted: Record<string, unknown>, expected: Record<
         const fieldConf = confidenceByField?.[key];
         const confStr = fieldConf !== undefined ? ` (conf: ${fieldConf.toFixed(0)}%)` : '';
         
-        if (extractedValue === expectedValue) {
+        // Use deep equality for arrays and objects
+        if (deepEqual(extractedValue, expectedValue)) {
             correct++;
         } else if (typeof expectedValue === 'number' && typeof extractedValue === 'number') {
             // Allow small numerical differences
@@ -236,7 +289,8 @@ function calculateAccuracy(extracted: Record<string, unknown>, expected: Record<
                 issues.push(`${key}: expected ${expectedValue}, got ${extractedValue}${confStr}`);
             }
         } else {
-            issues.push(`${key}: expected "${expectedValue}", got "${extractedValue}"${confStr}`);
+            // Use stringifyValue for readable output
+            issues.push(`${key}: expected ${stringifyValue(expectedValue)}, got ${stringifyValue(extractedValue)}${confStr}`);
         }
     }
 
@@ -250,9 +304,11 @@ function calculateAccuracy(extracted: Record<string, unknown>, expected: Record<
  * Test a single model with a single example
  */
 async function testModel(model: string, exampleName: string, difficulty: string, schema: any, input: string, expectedData: Record<string, unknown>): Promise<BenchmarkResult> {
+    // Merge base config with model-specific overrides
     const llmConfig: LLMConfig = {
         baseURL: 'http://localhost:11434/v1',
-        model
+        model,
+        ...MODEL_CONFIG[model],  // Apply model-specific config if exists
     };
 
     const errors: string[] = [];

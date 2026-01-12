@@ -4,6 +4,7 @@
 
 import { LLMClient } from '../llm/client.js';
 import { validateExtractedData } from './validator.js';
+import type { CoercionWarning } from './coercion.js';
 import { PipelineError, PipelineErrorCodes } from './errors.js';
 import { preprocessWithDetails } from './preprocessor.js';
 import type { ExtractionRequest, PipelineResult, StepResult } from './types.js';
@@ -91,7 +92,15 @@ export class ExtractionPipeline {
             });
             steps.push(validateStep);
 
-            const validation = validateStep.data as { valid: boolean; errors: Array<{ field: string; message: string; code: string }> };
+            const validation = validateStep.data as { 
+                valid: boolean; 
+                errors: Array<{ field: string; message: string; code: string }>;
+                warnings?: CoercionWarning[];
+                coercedData?: Record<string, unknown>;
+            };
+
+            // Use coerced data for output
+            const outputData = validation.coercedData ?? extraction.data;
 
             if (!validation.valid) {
                 const duration = Date.now() - startTime;
@@ -99,6 +108,7 @@ export class ExtractionPipeline {
                     success: false,
                     meetsThreshold: false,
                     errors: validation.errors,
+                    warnings: validation.warnings,
                     steps: this.debug ? steps : undefined,
                     metadata: {
                         duration,
@@ -130,7 +140,7 @@ export class ExtractionPipeline {
                 const duration = Date.now() - startTime;
                 return {
                     success: false,
-                    data: extraction.data,
+                    data: outputData,
                     confidence: extraction.confidence,
                     confidenceByField: extraction.confidenceByField,
                     meetsThreshold: false,
@@ -140,6 +150,7 @@ export class ExtractionPipeline {
                             code: PipelineErrorCodes.CONFIDENCE_ERROR,
                         },
                     ],
+                    warnings: validation.warnings,
                     steps: this.debug ? steps : undefined,
                     metadata: {
                         duration,
@@ -153,11 +164,12 @@ export class ExtractionPipeline {
             const duration = Date.now() - startTime;
             return {
                 success: true,
-                data: extraction.data,
+                data: outputData,
                 confidence: extraction.confidence,
                 confidenceByField: extraction.confidenceByField,
                 meetsThreshold: confidenceCheck.meetsThreshold,
                 errors: [],
+                warnings: validation.warnings,
                 steps: this.debug ? steps : undefined,
                 metadata: {
                     duration,

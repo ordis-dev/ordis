@@ -61,7 +61,7 @@ describe('Output Validator', () => {
             expect(result.valid).toBe(true);
         });
 
-        it('should detect type mismatch', () => {
+        it('should detect type mismatch for non-coercible values', () => {
             const schema: Schema = {
                 fields: {
                     age: { type: 'number' },
@@ -69,12 +69,29 @@ describe('Output Validator', () => {
             };
 
             const data = {
-                age: '30',
+                age: 'not a number',  // Cannot be coerced to number
             };
 
             const result = validateExtractedData(data, schema);
             expect(result.valid).toBe(false);
             expect(result.errors[0].code).toBe('TYPE_MISMATCH');
+        });
+
+        it('should coerce string numbers to numbers', () => {
+            const schema: Schema = {
+                fields: {
+                    age: { type: 'number' },
+                },
+            };
+
+            const data = {
+                age: '30',  // Coercible to 30
+            };
+
+            const result = validateExtractedData(data, schema);
+            expect(result.valid).toBe(true);
+            expect(result.coercedData?.age).toBe(30);
+            expect(result.warnings).toHaveLength(1);
         });
 
         it('should validate string pattern', () => {
@@ -114,7 +131,7 @@ describe('Output Validator', () => {
             expect(validateExtractedData({ status: 'pending' }, schema).valid).toBe(false);
         });
 
-        it('should collect multiple errors', () => {
+        it('should collect multiple errors for non-coercible values', () => {
             const schema: Schema = {
                 fields: {
                     name: { type: 'string' },
@@ -124,9 +141,9 @@ describe('Output Validator', () => {
             };
 
             const data = {
-                name: 123,
-                age: -5,
-                status: 'pending',
+                name: { complex: 'object' },  // Cannot coerce object to string
+                age: -5,  // Valid number but below min
+                status: 'pending',  // Valid string but not in enum
             };
 
             const result = validateExtractedData(data, schema);

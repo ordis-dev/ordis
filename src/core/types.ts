@@ -77,6 +77,12 @@ export interface PipelineResult {
         code: string;
         details?: Record<string, unknown>; // Original error details for formatting
     }>;
+    warnings?: Array<{
+        field: string;
+        message: string;
+        originalValue: unknown;
+        coercedValue: unknown;
+    }>;
     steps?: StepResult[];
     metadata: {
         duration: number;
