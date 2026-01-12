@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-01-12
+
+### Fixed
+- `maxContextTokens` now works as a top-level parameter in `extract()` ([#67](https://github.com/ordis-dev/ordis/issues/67))
+  - Previously, the parameter was ignored unless passed inside `llmConfig`
+  - Top-level `maxContextTokens` now takes precedence over `llmConfig.maxContextTokens`
+  - Both usage patterns are supported for backwards compatibility
+
 ## [0.4.0] - 2026-01-12
 
 ### Added

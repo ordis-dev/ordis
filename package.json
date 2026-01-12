@@ -1,6 +1,6 @@
 {
   "name": "@ordis-dev/ordis",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "type": "module",
   "description": "Schema-first LLM extraction tool that turns unstructured text into validated structured data",
   "main": "dist/index.js",
