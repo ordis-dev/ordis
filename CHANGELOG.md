@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-01-13
+
+### Changed
+- **Default context window increased to 32k** (was 4096)
+  - Modern LLMs commonly support 32k+ context windows
+  - `maxContextTokens` default: 4096 → 32768
+
+### Added
+- **AMD GPU support in benchmarks**
+  - Added `rocm-smi` detection alongside `nvidia-smi`
+  - Detects AMD GPU name from GFX version (e.g., gfx1100 → RX 7900 XTX/XT)
+  - Monitors VRAM usage and GPU utilization on AMD cards
+
+- **GPU health monitoring in benchmarks**
+  - Memory pressure detection (>85% warning, >95% critical)
+  - Low GPU utilization warning (may indicate CPU fallback)
+  - Per-test GPU warnings in console and markdown reports
+  - Global GPU Health Summary section in reports
+
+- **Benchmark model updates**
+  - Added: `gemma2:27b`, `qwen2.5:32b`
+  - Removed: `llama3.2:3b`, `deepseek-r1:7b`
+
+### Fixed
+- **Markdown-wrapped JSON parsing** ([#74](https://github.com/ordis-dev/ordis/issues/74))
+  - Some LLMs (e.g., Qwen 2.5) wrap JSON in markdown code blocks
+  - Added `unwrapMarkdownJSON()` to extract JSON from `\`\`\`json...\`\`\`` blocks
+  - Handles headers, trailing text, and nested braces in strings
+
 ## [0.5.0] - 2026-01-12
 
 ### Added
@@ -112,7 +141,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Benchmark suite for model comparison
 - Example schemas and input files
 
-[Unreleased]: https://github.com/ordis-dev/ordis/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/ordis-dev/ordis/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/ordis-dev/ordis/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/ordis-dev/ordis/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/ordis-dev/ordis/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/ordis-dev/ordis/compare/v0.1.0...v0.4.0

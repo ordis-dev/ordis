@@ -217,43 +217,34 @@ npm run benchmark
 
 ## Roadmap
 
+**Completed in v0.5.1:**
+- ✅ Default context window increased to 32k (was 4096)
+- ✅ Markdown-wrapped JSON parsing ([#74](https://github.com/ordis-dev/ordis/issues/74))
+- ✅ AMD GPU support in benchmarks (rocm-smi detection)
+- ✅ GPU health monitoring in benchmarks (VRAM pressure, utilization)
+
+**Completed in v0.5.0:**
+- ✅ Type coercion for LLM output ([#71](https://github.com/ordis-dev/ordis/issues/71))
+  - Automatic string-to-number/boolean coercion
+  - Null-like string handling ("null"/"none"/"n/a")
+  - Enum case-insensitive matching ("Series B" → "series_b")
+  - Date format normalization (US, EU, written formats)
+- ✅ Array of objects support ([#70](https://github.com/ordis-dev/ordis/issues/70))
+  - Nested object schemas with recursive validation
+  - Proper error paths (e.g., "items[1].price")
+- ✅ Ollama runtime options (num_ctx, num_gpu)
+
 **Completed in v0.4.0:**
 - ✅ User-friendly error messages ([#63](https://github.com/ordis-dev/ordis/issues/63))
   - Emoji indicators (❌, 💡, ℹ️) for quick scanning
   - Expected vs. actual values for validation errors
   - Actionable suggestions for common issues
   - Service-specific troubleshooting (Ollama, LM Studio, OpenAI)
-  - File system error handling (ENOENT, EACCES)
 - ✅ Debug mode enhancements
   - Full LLM request/response logging
   - Token usage breakdown
-  - System and user prompt visibility
-  - Detailed error context
 
-**Completed in v0.2.0:**
-- ✅ HTML stripping/preprocessing before extraction ([#59](https://github.com/ordis-dev/ordis/issues/59))
-  - `stripHtml: true` removes HTML tags, keeps text content
-  - `preserveStructure: true` converts headings/lists to markdown-like format
-  - `removeSelectors` for custom element removal
-  - Automatic removal of scripts, styles, nav, footer, ads
-
-**Completed in v0.1.0:**
-- ✅ Core extraction pipeline with schema validation
-- ✅ Token budget awareness and management
-- ✅ Confidence scoring for extracted data
-- ✅ Programmatic API for library usage
-- ✅ CLI tool with debug mode
-- ✅ Comprehensive test suite and benchmarks
-- ✅ Support for any OpenAI-compatible API
-
-**Upcoming:**
-- [ ] Schema validation error line numbers ([#64](https://github.com/ordis-dev/ordis/issues/64))
-- [ ] Smart input truncation ([#40](https://github.com/ordis-dev/ordis/issues/40))
-- [ ] Multi-pass extraction for large inputs ([#41](https://github.com/ordis-dev/ordis/issues/41))
-- [ ] Config file support ([#16](https://github.com/ordis-dev/ordis/issues/16))
-- [ ] Output formatting options ([#14](https://github.com/ordis-dev/ordis/issues/14))
-- [ ] Batch extraction ([#19](https://github.com/ordis-dev/ordis/issues/19))
-- [ ] More example schemas ([#13](https://github.com/ordis-dev/ordis/issues/13))
+See [CHANGELOG.md](CHANGELOG.md) for complete version history.
 
 ## Contributing
 
