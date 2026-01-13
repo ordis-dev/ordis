@@ -36,7 +36,7 @@ export interface TokenUsage {
  * Token counter configuration
  */
 export interface TokenCounterConfig {
-    /** Maximum context tokens (default: 4096) */
+    /** Maximum context tokens (default: 32768) */
     maxContextTokens?: number;
     /** Token budget breakdown */
     tokenBudget?: TokenBudget;
@@ -76,7 +76,7 @@ export class TokenCounter {
         };
 
         this.config = {
-            maxContextTokens: config.maxContextTokens || 4096,
+            maxContextTokens: config.maxContextTokens || 32768,
             tokenBudget: config.tokenBudget || defaultBudget,
             warnThreshold: config.warnThreshold || 90,
         };
