@@ -170,7 +170,7 @@ describe('TokenCounter', () => {
             const counter = new TokenCounter();
             const usage = counter.calculateUsage('', '');
 
-            expect(usage.maxContextTokens).toBe(4096);
+            expect(usage.maxContextTokens).toBe(32768);
             expect(usage.outputTokens).toBe(1000);
         });
 

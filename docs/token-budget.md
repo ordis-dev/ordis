@@ -76,7 +76,7 @@ const client = new LLMClient({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `maxContextTokens` | `number` | `4096` | Maximum context window size |
+| `maxContextTokens` | `number` | `32768` | Maximum context window size |
 | `tokenBudget` | `TokenBudget` | See below | Breakdown of token allocation |
 | `warnThreshold` | `number` | `90` | Warning threshold (percentage) |
 | `debugTokens` | `boolean` | `false` | Enable debug logging |

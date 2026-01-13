@@ -16,16 +16,16 @@ const execAsync = promisify(exec);
 
 // Models to test
 const MODELS = [
-    'llama3.2:3b',
-    'llama3.1:8b',       // Larger llama model with better reasoning
-    'qwen2.5:7b',
-    'deepseek-r1:7b',     // Reasoning-focused model for structured extraction
-    'deepseek-r1:14b'     // Larger reasoning model - should be even more accurate
+    'llama3.1:8b',        // Fast Llama baseline
+    'gemma2:27b',         // Google's largest local model
+    'qwen2.5:7b',         // Fast Qwen model
+    'qwen2.5:32b',        // Large Qwen for high accuracy
+    'deepseek-r1:32b'     // Reasoning-focused model for structured extraction
 ];
 
 // Model-specific configurations (e.g., larger context for high-VRAM setups)
 const MODEL_CONFIG: Record<string, Partial<LLMConfig>> = {
-    'deepseek-r1:14b': {
+    'deepseek-r1:32b': {
         maxContextTokens: 32768,  // 32k context - Ordis token budget
         ollamaOptions: {
             num_ctx: 32768,       // 32k context - Ollama runtime setting
@@ -79,6 +79,16 @@ interface BenchmarkResult {
     accuracy: number;
     errors: string[];
     fieldIssues: string[];
+    gpuWarnings?: string[];
+}
+
+interface GPUStatus {
+    memoryUsed: number;      // MB
+    memoryTotal: number;     // MB
+    memoryPercent: number;   // 0-100
+    gpuUtilization: number;  // 0-100
+    available: boolean;
+    warnings: string[];
 }
 
 interface BenchmarkReport {
@@ -86,6 +96,7 @@ interface BenchmarkReport {
     gitCommit?: string;
     gitBranch?: string;
     gpu: string;
+    gpuWarnings?: string[];
     results: BenchmarkResult[];
     summary: {
         modelsTotal: number;
@@ -116,18 +127,177 @@ async function getGitInfo(): Promise<{ commit?: string; branch?: string }> {
 }
 
 /**
- * Get GPU information
+ * Get GPU information (supports NVIDIA and AMD)
  */
 async function getGPUInfo(): Promise<string> {
+    // Try NVIDIA first
     try {
         const { stdout } = await execAsync('nvidia-smi --query-gpu=name,memory.total --format=csv,noheader');
         const [name, memory] = stdout.trim().split(',').map(s => s.trim());
         const memoryGB = Math.round(parseInt(memory.split(' ')[0]) / 1024);
         return `${name} (${memoryGB}GB)`;
-    } catch (error) {
-        // Fallback if nvidia-smi not available or error occurs
-        return 'GPU info unavailable';
+    } catch {
+        // NVIDIA not available, try AMD
     }
+
+    // Try AMD ROCm
+    try {
+        const { stdout: memInfo } = await execAsync('rocm-smi --showmeminfo vram');
+        const memMatch = memInfo.match(/VRAM Total Memory \(B\):\s*(\d+)/);
+        const memoryBytes = memMatch ? parseInt(memMatch[1]) : 0;
+        const memoryGB = Math.round(memoryBytes / (1024 * 1024 * 1024));
+
+        // Try to get GPU name from product info
+        let gpuName = 'AMD GPU';
+        try {
+            const { stdout: productInfo } = await execAsync('rocm-smi --showproductname');
+            const gfxMatch = productInfo.match(/GFX Version:\s*(gfx\d+)/);
+            if (gfxMatch) {
+                // Map GFX versions to marketing names
+                const gfxNames: Record<string, string> = {
+                    'gfx1100': 'AMD Radeon RX 7900 XTX/XT',
+                    'gfx1101': 'AMD Radeon RX 7800/7700',
+                    'gfx1102': 'AMD Radeon RX 7600',
+                    'gfx1030': 'AMD Radeon RX 6900/6800',
+                    'gfx1031': 'AMD Radeon RX 6800',
+                    'gfx1032': 'AMD Radeon RX 6700',
+                    'gfx90a': 'AMD Instinct MI250',
+                    'gfx942': 'AMD Instinct MI300',
+                };
+                gpuName = gfxNames[gfxMatch[1]] || `AMD GPU (${gfxMatch[1]})`;
+            }
+        } catch {
+            // Use generic name
+        }
+
+        return `${gpuName} (${memoryGB}GB)`;
+    } catch {
+        // AMD not available either
+    }
+
+    return 'GPU info unavailable';
+}
+
+/**
+ * Get current GPU status including memory and utilization (supports NVIDIA and AMD)
+ */
+async function getGPUStatus(): Promise<GPUStatus> {
+    const defaultStatus: GPUStatus = {
+        memoryUsed: 0,
+        memoryTotal: 0,
+        memoryPercent: 0,
+        gpuUtilization: 0,
+        available: false,
+        warnings: []
+    };
+
+    // Try NVIDIA first
+    try {
+        const { stdout } = await execAsync(
+            'nvidia-smi --query-gpu=memory.used,memory.total,utilization.gpu --format=csv,noheader,nounits'
+        );
+        
+        const parts = stdout.trim().split(',').map(s => parseInt(s.trim()));
+        if (parts.length >= 3 && !parts.some(isNaN)) {
+            const [memoryUsed, memoryTotal, gpuUtilization] = parts;
+            const memoryPercent = (memoryUsed / memoryTotal) * 100;
+            const warnings: string[] = [];
+
+            if (memoryPercent > 95) {
+                warnings.push(`⚠️  CRITICAL: GPU memory at ${memoryPercent.toFixed(0)}% - likely OOM or swapping to CPU`);
+            } else if (memoryPercent > 85) {
+                warnings.push(`⚠️  WARNING: GPU memory at ${memoryPercent.toFixed(0)}% - may cause slowdowns`);
+            }
+
+            return {
+                memoryUsed,
+                memoryTotal,
+                memoryPercent,
+                gpuUtilization,
+                available: true,
+                warnings
+            };
+        }
+    } catch {
+        // NVIDIA not available, try AMD
+    }
+
+    // Try AMD ROCm
+    try {
+        const { stdout: memInfo } = await execAsync('rocm-smi --showmeminfo vram');
+        const totalMatch = memInfo.match(/VRAM Total Memory \(B\):\s*(\d+)/);
+        const usedMatch = memInfo.match(/VRAM Total Used Memory \(B\):\s*(\d+)/);
+        
+        if (!totalMatch || !usedMatch) {
+            return { ...defaultStatus, warnings: ['Could not parse rocm-smi memory output'] };
+        }
+
+        const memoryTotal = Math.round(parseInt(totalMatch[1]) / (1024 * 1024)); // Convert to MB
+        const memoryUsed = Math.round(parseInt(usedMatch[1]) / (1024 * 1024));   // Convert to MB
+        const memoryPercent = (memoryUsed / memoryTotal) * 100;
+
+        // Get GPU utilization
+        let gpuUtilization = 0;
+        try {
+            const { stdout: useInfo } = await execAsync('rocm-smi --showuse');
+            const useMatch = useInfo.match(/GPU use \(%\):\s*(\d+)/);
+            if (useMatch) {
+                gpuUtilization = parseInt(useMatch[1]);
+            }
+        } catch {
+            // Utilization not available
+        }
+
+        const warnings: string[] = [];
+
+        if (memoryPercent > 95) {
+            warnings.push(`⚠️  CRITICAL: GPU memory at ${memoryPercent.toFixed(0)}% - likely OOM or swapping to CPU`);
+        } else if (memoryPercent > 85) {
+            warnings.push(`⚠️  WARNING: GPU memory at ${memoryPercent.toFixed(0)}% - may cause slowdowns`);
+        }
+
+        return {
+            memoryUsed,
+            memoryTotal,
+            memoryPercent,
+            gpuUtilization,
+            available: true,
+            warnings
+        };
+    } catch {
+        // AMD not available either
+    }
+
+    return { ...defaultStatus, warnings: ['GPU monitoring unavailable (no nvidia-smi or rocm-smi)'] };
+}
+
+/**
+ * Monitor GPU during inference and detect issues
+ */
+async function checkGPUHealth(model: string, preStatus: GPUStatus, postStatus: GPUStatus): Promise<string[]> {
+    const warnings: string[] = [];
+
+    if (!preStatus.available || !postStatus.available) {
+        warnings.push('⚠️  GPU monitoring unavailable - cannot verify GPU usage');
+        return warnings;
+    }
+
+    // Check if GPU was actually used (utilization should spike during inference)
+    if (postStatus.gpuUtilization < 5 && preStatus.gpuUtilization < 5) {
+        warnings.push(`⚠️  LOW GPU UTILIZATION (${postStatus.gpuUtilization}%) - model may be running on CPU`);
+    }
+
+    // Check for memory overflow
+    if (postStatus.memoryPercent > 95) {
+        warnings.push(`⚠️  MEMORY CRITICAL: ${postStatus.memoryUsed}/${postStatus.memoryTotal}MB (${postStatus.memoryPercent.toFixed(0)}%)`);
+    } else if (postStatus.memoryPercent > 85) {
+        warnings.push(`⚠️  MEMORY HIGH: ${postStatus.memoryUsed}/${postStatus.memoryTotal}MB (${postStatus.memoryPercent.toFixed(0)}%)`);
+    }
+
+    // Inherit any warnings from status checks
+    warnings.push(...postStatus.warnings);
+
+    return warnings;
 }
 
 /**
@@ -303,7 +473,7 @@ function calculateAccuracy(extracted: Record<string, unknown>, expected: Record<
 /**
  * Test a single model with a single example
  */
-async function testModel(model: string, exampleName: string, difficulty: string, schema: any, input: string, expectedData: Record<string, unknown>): Promise<BenchmarkResult> {
+async function testModel(model: string, exampleName: string, difficulty: string, schema: any, input: string, expectedData: Record<string, unknown>, monitorGPU: boolean = true): Promise<BenchmarkResult> {
     // Merge base config with model-specific overrides
     const llmConfig: LLMConfig = {
         baseURL: 'http://localhost:11434/v1',
@@ -312,11 +482,15 @@ async function testModel(model: string, exampleName: string, difficulty: string,
     };
 
     const errors: string[] = [];
+    const gpuWarnings: string[] = [];
     let duration = 0;
     let success = false;
     let confidence = 0;
     let accuracy = 0;
     let fieldIssues: string[] = [];
+
+    // Get GPU status before inference
+    const preGPUStatus = monitorGPU ? await getGPUStatus() : null;
 
     try {
         const start = performance.now();
@@ -330,6 +504,13 @@ async function testModel(model: string, exampleName: string, difficulty: string,
         duration = end - start;
         success = result.success;
         confidence = result.confidence || 0;
+
+        // Get GPU status after inference and check for issues
+        if (monitorGPU && preGPUStatus) {
+            const postGPUStatus = await getGPUStatus();
+            const warnings = await checkGPUHealth(model, preGPUStatus, postGPUStatus);
+            gpuWarnings.push(...warnings);
+        }
 
         if (result.data) {
             const accuracyResult = calculateAccuracy(result.data, expectedData, result.confidenceByField);
@@ -354,6 +535,14 @@ async function testModel(model: string, exampleName: string, difficulty: string,
         }
     } catch (error) {
         errors.push((error as Error).message);
+        
+        // Check GPU status on error - might indicate OOM
+        if (monitorGPU) {
+            const errorGPUStatus = await getGPUStatus();
+            if (errorGPUStatus.memoryPercent > 90) {
+                gpuWarnings.push(`⚠️  GPU memory at ${errorGPUStatus.memoryPercent.toFixed(0)}% during error - possible OOM`);
+            }
+        }
     }
 
     return {
@@ -365,7 +554,8 @@ async function testModel(model: string, exampleName: string, difficulty: string,
         confidence,
         accuracy,
         errors,
-        fieldIssues
+        fieldIssues,
+        gpuWarnings: gpuWarnings.length > 0 ? gpuWarnings : undefined
     };
 }
 
@@ -411,6 +601,13 @@ function displayResults(results: BenchmarkResult[]) {
                     console.log(`      ⚠️  ${issue}`);
                 }
             }
+            
+            // Display GPU warnings if any exist
+            if (result.gpuWarnings && result.gpuWarnings.length > 0) {
+                for (const warning of result.gpuWarnings) {
+                    console.log(`      🔥 ${warning}`);
+                }
+            }
             console.log('');
         }
         
@@ -441,6 +638,17 @@ function displayResults(results: BenchmarkResult[]) {
     console.log(`  Fastest: ${fastest.model} (${(fastest.duration / 1000).toFixed(2)}s)`);
     console.log(`  Most Accurate: ${mostAccurate.model} (${(mostAccurate.accuracy || 0).toFixed(0)}%)`);
     console.log(`  Best Quality: ${bestQuality.model} (${(((bestQuality.confidence || 0) + (bestQuality.accuracy || 0)) / 2).toFixed(0)}%)\n`);
+
+    // GPU Warnings Summary
+    const allGPUWarnings = results.flatMap(r => r.gpuWarnings || []);
+    if (allGPUWarnings.length > 0) {
+        const uniqueWarnings = [...new Set(allGPUWarnings)];
+        console.log('🔥 GPU Warnings:');
+        for (const warning of uniqueWarnings) {
+            console.log(`  ${warning}`);
+        }
+        console.log('');
+    }
 
     // Errors
     const withErrors = results.filter(r => r.errors && r.errors.length > 0);
@@ -528,6 +736,31 @@ function generateMarkdownReport(report: BenchmarkReport): string {
             }
             md += `\n`;
         }
+        
+        // Show GPU warnings if any
+        const withGPUWarnings = modelResults.filter(r => r.gpuWarnings && r.gpuWarnings.length > 0);
+        if (withGPUWarnings.length > 0) {
+            md += `**🔥 GPU Warnings:**\n\n`;
+            for (const result of withGPUWarnings) {
+                md += `- **${result.example}:**\n`;
+                for (const warning of result.gpuWarnings!) {
+                    md += `  - ${warning}\n`;
+                }
+            }
+            md += `\n`;
+        }
+    }
+    
+    // Global GPU warnings summary
+    const allGPUWarnings = results.flatMap(r => r.gpuWarnings || []);
+    if (allGPUWarnings.length > 0) {
+        const uniqueWarnings = [...new Set(allGPUWarnings)];
+        md += `---\n\n## 🔥 GPU Health Summary\n\n`;
+        md += `The following GPU issues were detected during the benchmark:\n\n`;
+        for (const warning of uniqueWarnings) {
+            md += `- ${warning}\n`;
+        }
+        md += `\n`;
     }
     
     return md;
@@ -558,6 +791,7 @@ async function saveBenchmarkReport(results: BenchmarkResult[], gpu: string) {
         gitCommit: gitInfo.commit,
         gitBranch: gitInfo.branch,
         gpu,
+        gpuWarnings: [...new Set(results.flatMap(r => r.gpuWarnings || []))],
         results,
         summary: {
             modelsTotal: new Set(results.map(r => r.model)).size,
@@ -630,7 +864,8 @@ async function runModelBenchmark() {
             await testModel(model, 'warmup', 'warmup', 
                 { fields: { test: { type: 'string' } } }, 
                 'Quick warmup test', 
-                { test: 'warmup' }
+                { test: 'warmup' },
+                false  // Skip GPU monitoring for warmup
             );
         } catch (error) {
             console.log(`  Note: Warmup failed, continuing anyway`);

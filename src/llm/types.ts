@@ -37,7 +37,7 @@ export interface LLMConfig {
     maxTokens?: number;
     timeout?: number;
     retries?: RetryConfig;
-    /** Maximum context tokens (default: 4096) */
+    /** Maximum context tokens (default: 32768) */
     maxContextTokens?: number;
     /** Token budget breakdown */
     tokenBudget?: TokenBudget;
