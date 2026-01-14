@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-01-14
+
+### Added
+- **JSON mode support for OpenAI and Ollama providers** ([#78](https://github.com/ordis-dev/ordis/issues/78), [#79](https://github.com/ordis-dev/ordis/pull/79))
+  - Optional `--json-mode` CLI flag to enforce strict JSON responses
+  - Auto-detection of provider type based on base URL
+    - `:11434` → Ollama (uses `format: "json"`)
+    - `:1234` → LM Studio (Ollama-compatible)
+    - Others → OpenAI (uses `response_format: { type: "json_object" }`)
+  - Manual override with `--provider` flag for edge cases
+  - Programmatic API: `jsonMode: boolean` and `provider: 'openai' | 'ollama'` in LLMConfig
+  - Eliminates parsing failures from non-JSON responses
+  - Full documentation in `docs/json-mode.md`
+
 ## [0.5.1] - 2026-01-13
 
 ### Changed

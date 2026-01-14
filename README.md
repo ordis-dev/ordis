@@ -273,6 +273,12 @@ npm run benchmark
 
 ## Roadmap
 
+**Completed in v0.6.0:**
+- ✅ JSON mode support for OpenAI and Ollama providers ([#78](https://github.com/ordis-dev/ordis/issues/78))
+  - Auto-detection based on base URL
+  - Eliminates parsing failures from non-JSON responses
+  - Works with both Ollama (`format: "json"`) and OpenAI (`response_format`)
+
 **Completed in v0.5.1:**
 - ✅ Default context window increased to 32k (was 4096)
 - ✅ Markdown-wrapped JSON parsing ([#74](https://github.com/ordis-dev/ordis/issues/74))
