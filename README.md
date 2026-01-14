@@ -109,6 +109,38 @@ ordis extract \
   --api-key your-api-key-here
 ```
 
+**Enable JSON mode** (for reliable JSON responses):
+
+```bash
+# OpenAI and compatible providers
+ordis extract \
+  --schema examples/invoice.schema.json \
+  --input examples/invoice.txt \
+  --base https://api.openai.com/v1 \
+  --model gpt-4o-mini \
+  --api-key your-api-key \
+  --json-mode
+
+# Ollama (auto-detected)
+ordis extract \
+  --schema examples/invoice.schema.json \
+  --input examples/invoice.txt \
+  --base http://localhost:11434/v1 \
+  --model qwen2.5:32b \
+  --json-mode
+
+# Explicit provider override
+ordis extract \
+  --schema examples/invoice.schema.json \
+  --input examples/invoice.txt \
+  --base http://localhost:11434/v1 \
+  --model qwen2.5:32b \
+  --json-mode \
+  --provider ollama
+```
+
+JSON mode forces the model to return only valid JSON. Provider is auto-detected from the base URL.
+
 ### Programmatic Usage
 
 Use ordis as a library in your Node.js application:
@@ -165,6 +197,30 @@ const result = await extract({
   llmConfig: LLMPresets.ollama('llama3.2:3b')
   // Or: LLMPresets.openai(apiKey, 'gpt-4o-mini')
   // Or: LLMPresets.lmStudio('local-model')
+});
+
+// Enable JSON mode (provider auto-detected from baseURL)
+const resultWithJsonMode = await extract({
+  input: text,
+  schema,
+  llmConfig: {
+    baseURL: 'http://localhost:11434/v1',
+    model: 'qwen2.5:32b',
+    jsonMode: true  // Auto-detects Ollama, uses format: "json"
+  }
+});
+
+// Explicit provider override
+const resultExplicit = await extract({
+  input: text,
+  schema,
+  llmConfig: {
+    baseURL: 'https://api.openai.com/v1',
+    model: 'gpt-4o-mini',
+    apiKey: process.env.OPENAI_API_KEY,
+    jsonMode: true,
+    provider: 'openai'  // Uses response_format: { type: "json_object" }
+  }
 });
 ```
 

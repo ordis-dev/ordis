@@ -56,6 +56,10 @@ export interface LLMConfig {
         /** Number of layers to run on GPU (-1 = all, 0 = none) */
         num_gpu?: number;
     };
+    /** Enable JSON mode to force valid JSON responses */
+    jsonMode?: boolean;
+    /** Provider type for JSON mode compatibility (auto-detected if not specified) */
+    provider?: 'openai' | 'ollama';
 }
 
 /**
@@ -74,6 +78,12 @@ export interface LLMRequest {
     messages: ChatMessage[];
     temperature?: number;
     max_tokens?: number;
+    /** OpenAI-compatible response format (e.g., { type: "json_object" }) */
+    response_format?: {
+        type: 'json_object' | 'text';
+    };
+    /** Ollama-specific format parameter ("json" for JSON mode) */
+    format?: 'json';
     /** Ollama-specific options (passed through on Ollama endpoints) */
     options?: {
         num_ctx?: number;

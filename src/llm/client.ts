@@ -26,6 +26,7 @@ export class LLMClient {
         backoffFactor: number;
     };
     private tokenCounter: TokenCounter;
+    private provider: 'openai' | 'ollama';
 
     constructor(config: LLMConfig) {
         this.config = {
@@ -45,6 +46,25 @@ export class LLMClient {
             tokenBudget: config.tokenBudget,
             warnThreshold: config.warnThreshold,
         });
+        // Auto-detect provider if not explicitly set
+        this.provider = config.provider || this.detectProvider(config.baseURL);
+    }
+
+    /**
+     * Detect provider type from base URL
+     */
+    private detectProvider(baseURL: string): 'openai' | 'ollama' {
+        const url = baseURL.toLowerCase();
+        // Ollama typically uses port 11434
+        if (url.includes(':11434') || url.includes('localhost:11434')) {
+            return 'ollama';
+        }
+        // LM Studio uses port 1234
+        if (url.includes(':1234') || url.includes('localhost:1234')) {
+            return 'ollama'; // LM Studio uses Ollama-compatible format
+        }
+        // Default to OpenAI format for cloud providers
+        return 'openai';
     }
 
     /**
@@ -96,9 +116,33 @@ export class LLMClient {
             max_tokens: this.config.maxTokens,
         };
 
+        // Add JSON mode based on provider
+        if (this.config.jsonMode) {
+            if (this.provider === 'ollama') {
+                // Ollama uses format parameter
+                request.format = 'json';
+            } else {
+                // OpenAI uses response_format parameter
+                request.response_format = { type: 'json_object' };
+            }
+        }
+
         // Add Ollama-specific options if configured
         if (this.config.ollamaOptions) {
             request.options = this.config.ollamaOptions;
+        }
+
+        if (this.config.debug) {
+            console.error('[DEBUG] Provider:', this.provider);
+            console.error('[DEBUG] LLM Request:', {
+                model: request.model,
+                temperature: request.temperature,
+                max_tokens: request.max_tokens,
+                response_format: request.response_format,
+                format: request.format,
+                jsonMode: this.config.jsonMode,
+                options: request.options,
+            });
         }
 
         // Call API with retries

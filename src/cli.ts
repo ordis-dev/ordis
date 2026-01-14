@@ -22,6 +22,8 @@ interface CliArgs {
     model?: string;
     apiKey?: string;
     debug?: boolean;
+    jsonMode?: boolean;
+    provider?: 'openai' | 'ollama';
 }
 
 function parseArgs(args: string[]): CliArgs {
@@ -42,6 +44,22 @@ function parseArgs(args: string[]): CliArgs {
 
         if (arg === '--debug') {
             parsed.debug = true;
+            continue;
+        }
+
+        if (arg === '--json-mode') {
+            parsed.jsonMode = true;
+            continue;
+        }
+
+        if (arg === '--provider' && args[i + 1]) {
+            const provider = args[++i];
+            if (provider === 'openai' || provider === 'ollama') {
+                parsed.provider = provider;
+            } else {
+                console.error(`Error: Invalid provider "${provider}". Must be "openai" or "ollama"`);
+                process.exit(1);
+            }
             continue;
         }
 
@@ -76,6 +94,8 @@ OPTIONS:
   --base <url>      Base URL for OpenAI-compatible API
   --model <name>    Model name to use for extraction
   --api-key <key>   API key for the LLM provider (optional)
+  --json-mode       Enable JSON mode for reliable JSON responses
+  --provider <type> Provider type: 'openai' or 'ollama' (auto-detected if not set)
   --debug           Enable verbose debug output
   --version, -v     Show version number
   --help, -h        Show this help message
@@ -160,6 +180,8 @@ async function runExtraction(args: CliArgs): Promise<void> {
             model: args.model,
             ...(args.apiKey && { apiKey: args.apiKey }),
             debug: args.debug,
+            ...(args.jsonMode && { jsonMode: true }),
+            ...(args.provider && { provider: args.provider }),
         };
 
         if (args.debug) {

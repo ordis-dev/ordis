@@ -25,11 +25,24 @@ const MODELS = [
 
 // Model-specific configurations (e.g., larger context for high-VRAM setups)
 const MODEL_CONFIG: Record<string, Partial<LLMConfig>> = {
+    'llama3.1:8b': {
+        jsonMode: true,  // Enable JSON mode for reliable JSON responses
+    },
+    'gemma2:27b': {
+        jsonMode: true,  // Enable JSON mode for reliable JSON responses
+    },
+    'qwen2.5:7b': {
+        jsonMode: true,  // Enable JSON mode for reliable JSON responses
+    },
+    'qwen2.5:32b': {
+        jsonMode: true,  // Enable JSON mode for reliable JSON responses
+    },
     'deepseek-r1:32b': {
         maxContextTokens: 32768,  // 32k context - Ordis token budget
         ollamaOptions: {
             num_ctx: 32768,       // 32k context - Ollama runtime setting
         },
+        jsonMode: true,  // Enable JSON mode for reliable JSON responses
     },
 };
 
