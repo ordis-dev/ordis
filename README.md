@@ -264,6 +264,11 @@ npm run benchmark
 
 ## Roadmap
 
+**Completed in v0.6.1:**
+- ✅ Fixed JSON mode with Ollama /v1 endpoint ([#81](https://github.com/ordis-dev/ordis/issues/81))
+  - Automatic endpoint detection (response_format for /v1, format for /api)
+  - Improved documentation with endpoint comparison and recommendations
+
 **Completed in v0.6.0:**
 - ✅ JSON mode support for OpenAI and Ollama providers ([#78](https://github.com/ordis-dev/ordis/issues/78))
   - Auto-detection based on base URL

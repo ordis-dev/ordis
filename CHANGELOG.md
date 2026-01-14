@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-01-14
+
+### Fixed
+- **JSON mode with Ollama /v1 endpoint** ([#81](https://github.com/ordis-dev/ordis/issues/81), [#82](https://github.com/ordis-dev/ordis/pull/82))
+  - Ollama's OpenAI-compatible `/v1/chat/completions` endpoint now correctly uses `response_format` instead of `format`
+  - Native `/api/chat` endpoint continues to use `format: "json"`
+  - Automatic endpoint detection - no user configuration needed
+  - Fixes issue where `/v1` endpoint with `format` parameter returned markdown-wrapped JSON
+
+### Documentation
+- Added clear comparison of Ollama `/v1` vs `/api` endpoints
+- Recommended `/v1` endpoint for portability across providers
+- Explained when to use each endpoint type
+
 ## [0.6.0] - 2026-01-14
 
 ### Added
